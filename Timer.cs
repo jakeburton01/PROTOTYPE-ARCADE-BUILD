@@ -41,7 +41,7 @@ public class Timer : MonoBehaviour
 
         timerText.text = string.Format("{0:00}:{1:00}", roundTimerMins, roundTimerSeconds);
 
-        if (roundTimerMins > 1f && roundTimerSeconds < 0f)
+        if (roundTimerMins >= 1f && roundTimerSeconds <= 0f)
         {
             roundTimerMins--;
             roundTimerSeconds = 59f;

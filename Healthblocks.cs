@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Healthblocks : MonoBehaviour
 {
     public List<RawImage> segments = new List<RawImage>();
-    public RawImage healthPrefab;
+    public RawImage healthPrefab, damagedHealthPrefab;
     public Color defaultColor;
     public bool blockFlashing;
     public bool neutral;
@@ -15,6 +15,7 @@ public class Healthblocks : MonoBehaviour
     public float chargedTimer;
     public Text gameOverText;
     public Vector3[] positions;
+    RawImage FlashingBlock;
     //array of positions that looks at how many blocks of health left through segment list 
     //damage powerup boolean turns true the player is given an increased damage punch which can only be used once and will have to be the next attack 
 
@@ -37,6 +38,7 @@ public class Healthblocks : MonoBehaviour
         positions[4] = segments[4].transform.position;
         positions[5] = segments[5].transform.position;
         segments.RemoveAt(i);
+        FlashingBlock = segments[4];
     }
 
 
@@ -51,6 +53,10 @@ public class Healthblocks : MonoBehaviour
         i = segments.Count - 1;
         regenTimer += Time.deltaTime;
 
+        if (blockFlashing)
+        {
+            FlashingBlock = segments[i];
+        }
 
         //if healthbar is empty then bring up game over text 
         if (segments.Count == 0)
@@ -58,13 +64,13 @@ public class Healthblocks : MonoBehaviour
             GameOver();
         }
 
-        if (regenTimer == 10f)
+        if (regenTimer >= 11f)
         {
             regenTimer = 0f;
         }
 
         //if 5 seconds have passed since health block began flashing then stop health block flashing(regenerating that health block)
-        if (regenTimer > 10f)
+        if (regenTimer >= 10f)
         {
             HealthRegen(); 
         }
@@ -98,11 +104,9 @@ public class Healthblocks : MonoBehaviour
 
     public IEnumerator Flashingbar()
     {
-        RawImage FlashingBlock = segments[i];
         //while blockflashing is true the last health block in the array will be enabled and disabled to give the illusion of it flashing
         while (blockFlashing)
-        {        
-            FlashingBlock.color = Color.red;
+        {
             FlashingBlock.color = Color.clear;
             yield return new WaitForSeconds(0.5f);
             FlashingBlock.color = Color.red;
@@ -111,8 +115,8 @@ public class Healthblocks : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             FlashingBlock.color = Color.red;
             yield return new WaitForSeconds(0.5f);
-        } 
-
+        }
+        yield return FlashingBlock.color = defaultColor;
     }
 
     public void GameOver()
@@ -122,9 +126,8 @@ public class Healthblocks : MonoBehaviour
 
     public void NormalDamage()
     {
-        //regenTimer += Time.deltaTime;
         regenTimer = 0f;
-        print(segments[i]);
+        StopAllCoroutines();
 
         if (neutral)
         {
@@ -137,10 +140,9 @@ public class Healthblocks : MonoBehaviour
         else
         {
             //couroutine stopped so block stops flashing - meaning the blockfalshing boolean is now false - and the block that was flashing gets destroyed 
-            StopCoroutine(Flashingbar());
             blockFlashing = false;
+            StopCoroutine(Flashingbar());
             neutral = true;
-            segments[i].enabled = true;
             RawImage SelectedBlock = segments[i];
             segments.RemoveAt(i);
             SelectedBlock.enabled = false;
@@ -244,104 +246,130 @@ public class Healthblocks : MonoBehaviour
     {
         if (blockFlashing == true)
         {
-            StopCoroutine(Flashingbar());
-            segments[i].enabled = true;
-            segments[i].color = defaultColor;
             blockFlashing = false;
-            neutral = true;
+            StopCoroutine(Flashingbar());
+            neutral = true;          
         }
     }
 
     void HealthPickup()
     {
-        if (neutral)
+
+        if (segments.Count < 6)
         {
-            var newHealth1 = (RawImage)Instantiate(healthPrefab) as RawImage;
-            newHealth1.transform.SetParent(transform, false);
-            newHealth1.enabled = true;
-            segments.Add(newHealth1);
-            
 
-            if (segments.Count == 6)
+            if (neutral)
             {
-                newHealth1.transform.position = positions[5];
+                var newHealth1 = (RawImage)Instantiate(healthPrefab) as RawImage;
+                newHealth1.transform.SetParent(transform, false);
+                newHealth1.enabled = true;
+                segments.Add(newHealth1);
 
+
+                if (segments.Count == 6)
+                {
+                    newHealth1.transform.position = positions[5];
+
+
+                }
+
+                if (segments.Count == 5)
+                {
+                    newHealth1.transform.position = positions[4];
+
+                }
+
+                if (segments.Count == 4)
+                {
+                    newHealth1.transform.position = positions[3];
+
+                }
+
+                if (segments.Count == 3)
+                {
+                    newHealth1.transform.position = positions[2];
+
+                }
+
+                if (segments.Count == 2)
+                {
+                    newHealth1.transform.position = positions[1];
+
+                }
+
+                if (segments.Count == 1)
+                {
+                    newHealth1.transform.position = positions[0];
+
+                }
+            }
+            else
+            {
+                blockFlashing = false;
+                StopCoroutine(Flashingbar());
+                neutral = true;
+                var newHealth = (RawImage)Instantiate(damagedHealthPrefab) as RawImage;
+                newHealth.transform.SetParent(transform, false);
+                newHealth.enabled = true;
+                segments.Add(newHealth);
+                i = segments.Count - 1;
+
+                if (segments.Count == 6)
+                {
+                    newHealth.transform.position = positions[5];
+                    regenTimer = 0f;
+                    StartCoroutine(Flashingbar());
+                    blockFlashing = true;
+                    neutral = false;
+
+                }
+
+                if (segments.Count == 5)
+                {
+                    newHealth.transform.position = positions[4];
+                    regenTimer = 0f;
+                    StartCoroutine(Flashingbar());
+                    blockFlashing = true;
+                    neutral = false;
+                }
+
+                if (segments.Count == 4)
+                {
+                    newHealth.transform.position = positions[3];
+                    regenTimer = 0f;
+                    StartCoroutine(Flashingbar());
+                    blockFlashing = true;
+                    neutral = false;
+                }
+
+                if (segments.Count == 3)
+                {
+                    newHealth.transform.position = positions[2];
+                    regenTimer = 0f;
+                    StartCoroutine(Flashingbar());
+                    blockFlashing = true;
+                    neutral = false;
+                }
+
+                if (segments.Count == 2)
+                {
+                    newHealth.transform.position = positions[1];
+                    regenTimer = 0f;
+                    StartCoroutine(Flashingbar());
+                    blockFlashing = true;
+                    neutral = false;
+                }
+
+                if (segments.Count == 1)
+                {
+                    newHealth.transform.position = positions[0];
+                    regenTimer = 0f;
+                    StartCoroutine(Flashingbar());
+                    blockFlashing = true;
+                    neutral = false;
+                }
             }
 
-            if (segments.Count == 5)
-            {
-                newHealth1.transform.position = positions[4];
-
-            }
-
-            if (segments.Count == 4)
-            {
-                newHealth1.transform.position = positions[3];
-
-            }
-
-            if (segments.Count == 3)
-            {
-                newHealth1.transform.position = positions[2];
-
-            }
-
-            if (segments.Count == 2)
-            {
-                newHealth1.transform.position = positions[1];
-
-            }
-
-            if (segments.Count == 1)
-            {
-                newHealth1.transform.position = positions[0];
-
-            }
-        }
-        else 
-        {
-            StopCoroutine(Flashingbar());
-            blockFlashing = false;
-            neutral = true;
-            var newHealth = (RawImage)Instantiate(healthPrefab) as RawImage;
-            newHealth.transform.SetParent(transform, false);
-            newHealth.enabled = true;
-            segments.Add(newHealth);
-           
-
-            if (segments.Count == 6)
-            {
-                newHealth.transform.position = positions[5];
-                segments[5].color = Color.blue;
-                StartCoroutine(Flashingbar());
-                blockFlashing = true;
-                neutral = false;
-            }
-
-            if (segments.Count == 5)
-            {
-                newHealth.transform.position = positions[4];
-            }
-
-            if (segments.Count == 4)
-            {
-                newHealth.transform.position = positions[3];
-            }
-
-            if (segments.Count == 3)
-            {
-                newHealth.transform.position = positions[2];
-            }
-
-            if (segments.Count == 2)
-            {
-                newHealth.transform.position = positions[1];
-            }
-
-            if (segments.Count == 1)
-            {
-                newHealth.transform.position = positions[0];
-            }
         }
 
     }
