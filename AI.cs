@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -29,10 +29,10 @@ public class AI : MonoBehaviour
     public float previousHealth; //Used in the HealthBar function ###Not actively being used in current iteration###
     public float thrust = 20; //NOT IMPLEMENTED    ##########
 
-    public Material red;
+    /*public Material red;
     public Material blue;
     public Material yellow;
-    public Material current; //The current Material for shifting between a charge attack material and the HP material
+    public Material current; //The current Material for shifting between a charge attack material and the HP material*/
     public Renderer m_renderer; //The renderer for  this specific unit
 
     public float wanderRadius; //Radius of the sphere that the AI can chose a destination within
@@ -65,6 +65,8 @@ public class AI : MonoBehaviour
     public bool HPBarSet;
 	public int HPBarHitValue;
 
+    private CharacterAnimation player_Anim;
+
     void Start()
     {
         //Loading in all the basic components and declaring variables
@@ -82,8 +84,8 @@ public class AI : MonoBehaviour
         hpSearchcheck = 300;
         HPBarSet = false;
 		HPBarHitValue = 0;
-
-}
+        player_Anim = GetComponent<CharacterAnimation>();
+    }
 
     // Update is called once per frame
     void Update()
@@ -91,186 +93,240 @@ public class AI : MonoBehaviour
         /*GameObject[] finder;
         finder = GameObject.FindGameObjectsWithTag("Enemy");
         Find = finder[0];*/             //Literally no idea what this is
-        if (Input.GetKeyDown("q"))
+
+        if (enemy_AI.enabled == false)
         {
-            Health -= 10;
-			HPBarSet = true;
+
+            timer += Time.deltaTime;
+            if (timer >= 2)
+            {
+                enemy_AI.enabled = true;
+                timer = 0;
+            }
         }
-		
-		if (enemy_AI.enabled == false)
-		{	
-			
-			timer += Time.deltaTime;
-			if (timer >= 2)
-			{
-				enemy_AI.enabled = true;
-				timer = 0;
-			}
-		}
-        if (hasHit == true && hitCooldownTimer <= 0)
+
+        else if (enemy_AI.enabled == true)
         {
-            hasHit = false;
-            hitCooldownTimer = 1;
-        }//This is for after a unit has hit, after the hit timer runs down to 0 it will reset to the original values.  (Hit cooldown)
+            if (enemy_AI.isStopped == false)
+            {
+                player_Anim.Walk(true);
+            }
+            if (enemy_AI.isStopped)
+            {
+                player_Anim.Walk(false);
+            }
 
 
-        if (Health <= 75 && Health > 50)
-        {
-            m_renderer.material = blue;
-        }
-        if (Health <= 50 && Health > 20)
-        {
-            m_renderer.material = red;
-        }   //Visual aids   ###TO BE REMOVED###
+            if (Input.GetKeyDown("q"))
+            {
+                Health -= 10;
+                HPBarSet = true;
+            }
 
-		if(Health <= 20  && CurrentState == States.Idle)
-		{
-			runAway();
-		}
 
-        if (Health <= 0)
-        {
-            Destroy(this.gameObject);
-            // enemy_AI.enabled = false;
-            // this.gameObject.tag = "Untagged";
+            if (hasHit == true && hitCooldownTimer <= 0)
+            {
+                hasHit = false;
+                hitCooldownTimer = 1;
+            }//This is for after a unit has hit, after the hit timer runs down to 0 it will reset to the original values.  (Hit cooldown)
 
-        } //This destroys the game object once reaching 0 HP
-        if (Target != null)
-        {
 
-            Distance = Vector3.Distance(transform.position, Target.position);
-        } //If its found a target this sets the Distance to the target each frame
-        else
-        {
-            Distance = 0;
-            CurrentState = States.Idle;
+            if (Health <= 75 && Health > 50)
+            {
+                //m_renderer.material = blue;
+            }
+            if (Health <= 50 && Health > 20)
+            {
+                //m_renderer.material = red;
+            }   //Visual aids   ###TO BE REMOVED###
 
-        } //If no target is found then it remains in idle, reset statement
+            if (Health <= 20)
+            {
+                CurrentState = States.RunAway;
+            }
 
-        switch (CurrentState)//Overall start of the state machine
-        {
-            case States.Idle:
-                {
+            if (Health <= 0)
+            {
+                Destroy(this.gameObject);
+                // enemy_AI.enabled = false;
+                // this.gameObject.tag = "Untagged";
 
-                    
-                    if (Health > 20)
+            } //This destroys the game object once reaching 0 HP
+            if (Target != null)
+            {
+
+                Distance = Vector3.Distance(transform.position, Target.position);
+            } //If its found a target this sets the Distance to the target each frame
+            else if (Target == null)
+            {
+                Distance = 0;
+                CurrentState = States.Idle;
+
+            } //If no target is found then it remains in idle, reset statement
+
+            switch (CurrentState)//Overall start of the state machine
+            {
+                case States.Idle:
                     {
-                        timer += Time.deltaTime; //Starts a frame timer for how long the AI can be in idle before switching out
-                        RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);   //Creates a sphere around the AI position and spawns a waypoint [custom function]
-                        if (AINumber == 1)
-                        {
-                            wayPointGO = GameObject.Find("Waypoint_AI1");
-                        }
-                        else if (AINumber == 2)
-                        {
-                            wayPointGO = GameObject.Find("Waypoint_AI2");
-                        }
-                        else if (AINumber == 3)
-                        {
-                            wayPointGO = GameObject.Find("Waypoint_AI3");
-                        }
-                        else if (AINumber == 4)
-                        {
-                            wayPointGO = GameObject.Find("Waypoint_AI4");
-                        }//Ensuring the AI units path towards the correct waypoints, rather than pathing towards the same waypoint
-                        wayDistance = Vector3.Distance(transform.position, wayPointGO.transform.position);
-                        if (timer <= wanderTimer)
-                        {
 
-                            enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
-                            NavMeshPath path = new NavMeshPath();
-                            enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
-                            if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
+
+                        if (Health > 20)
+                        {
+                            timer += Time.deltaTime; //Starts a frame timer for how long the AI can be in idle before switching out
+                            RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);   //Creates a sphere around the AI position and spawns a waypoint [custom function]
+                            if (AINumber == 1)
                             {
 
-                                Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
-                                wayPoint = false;//States that no waypoint is active so another is to be spawned    [Inside RandomNavSphereWaypoint function]
+                                try
+                                {
+                                    wayPointGO = GameObject.Find("Waypoint_AI1");
+                                    wayDistance = Vector3.Distance(transform.position, wayPointGO.transform.position);
+                                }
+                                catch
+                                {
+                                    print("NO WAYPOINT FOUND");
+                                }
                             }
-                            else if (wayDistance <= enemy_AI.stoppingDistance)
+                            else if (AINumber == 2)
                             {
-                                Destroy(wayPointGO);
-                                wayPoint = false;  //If the AI unit reaches the waypoint, destroy it and create another
+                                try
+                                {
+                                    wayPointGO = GameObject.Find("Waypoint_AI2");
+                                    wayDistance = Vector3.Distance(transform.position, wayPointGO.transform.position);
+                                }
+                                catch
+                                {
+                                    print("NO WAYPOINT FOUND");
+                                }
                             }
-                            //Vector3 newPos = RandomNavSphere(this.transform.position, wanderRadius, -1);
+                            else if (AINumber == 3)
+                            {
+                                try
+                                {
+                                    wayPointGO = GameObject.Find("Waypoint_AI3");
+                                    wayDistance = Vector3.Distance(transform.position, wayPointGO.transform.position);
+                                }
+                                catch
+                                {
+                                    print("NO WAYPOINT FOUND");
+                                }
+                            }
+                            else if (AINumber == 4)
+                            {
+                                try
+                                {
+                                    wayPointGO = GameObject.Find("Waypoint_AI4");
+                                    wayDistance = Vector3.Distance(transform.position, wayPointGO.transform.position);
+                                }
+                                catch
+                                {
+                                    print("NO WAYPOINT FOUND");
+                                }
+                            }//Ensuring the AI units path towards the correct waypoints, rather than pathing towards the same waypoint
 
-                            //enemy_AI.SetDestination();
+                            if (timer <= wanderTimer && wayPointGO != null)
+                            {
 
+                                enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
+                                NavMeshPath path = new NavMeshPath();
+                                print("Path Found");
+                                enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
+                                if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
+                                {
+
+                                    Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
+                                    print("invalid path");
+                                    wayPoint = false;//States that no waypoint is active so another is to be spawned    [Inside RandomNavSphereWaypoint function]
+                                }
+                                else if (wayDistance <= enemy_AI.stoppingDistance)
+                                {
+                                    Destroy(wayPointGO);
+                                    print("Path concluded");
+                                    wayPoint = false;  //If the AI unit reaches the waypoint, destroy it and create another
+                                }
+                                //Vector3 newPos = RandomNavSphere(this.transform.position, wanderRadius, -1);
+
+                                //enemy_AI.SetDestination();
+
+                            }
+
+                            if (timer >= wanderTimer)
+                            {
+                                timer = 0;
+                                Search();//Once the timer reaches its max allowed value, move into search
+                            }
+
+                            if (Health <= 50 && dizzy == false && dizzyCheck == 0)
+                            {
+                                CurrentState = States.Dizzy;
+
+                                dizzy = true; //If hit below 50% hp for first time, become dizzy    ###BUGGY###
+                                dizzyCheck = dizzyCheck + 1;
+                            }
+                            if (dizzy)
+                            {
+                                dizzyTimer += Time.deltaTime;
+
+                                if (dizzyTimer >= 5)
+                                {
+                                    enemy_AI.enabled = true;
+                                    dizzy = false;
+                                }
+                            }
+                            if (hasHit == true)
+                            {
+                                hitCooldownTimer -= Time.deltaTime; //If the unit has hit the enemy a timer will count down to 0, when at 0 it can hit again.  Functions as a hit cooldown.
+                            }
                         }
 
-                        if (timer >= wanderTimer)
-                        {
-                            timer = 0;
-                            Search();//Once the timer reaches its max allowed value, move into search
-                        }
-
-                        if (Health <= 50 && dizzy == false && dizzyCheck == 0)
-                        {
-                            CurrentState = States.Dizzy;
-							
-                            dizzy = true; //If hit below 50% hp for first time, become dizzy    ###BUGGY###
-							dizzyCheck = dizzyCheck + 1;
-                        }
-						if(dizzy)
-						{
-							dizzyTimer += Time.deltaTime;
-							
-							if(dizzyTimer >= 5)
-							{
-								enemy_AI.enabled = true;
-								dizzy = false;
-							}
-						}
-                        if (hasHit == true)
-                        {
-                            hitCooldownTimer -= Time.deltaTime; //If the unit has hit the enemy a timer will count down to 0, when at 0 it can hit again.  Functions as a hit cooldown.
-                        }
+                        break;
                     }
 
-                    break;
-                }
+                case States.Search:
+                    {
+                        Search();
+                        break;
+                    }
 
-            case States.Search:
-                {
-                    Search();
-                    break;
-                }
+                case States.Move:
+                    {
 
-            case States.Move:
-                {
+                        Move();
+                        break;
+                    }
 
-                    Move();
-                    break;
-                }
+                case States.Hit:
+                    {
+                        Hit();
+                        hitTimer += Time.deltaTime; //Literally no idea what this does
+                        break;
+                    }
 
-            case States.Hit:
-                {
-                    Hit();
-                    hitTimer += Time.deltaTime; //Literally no idea what this does
-                    break;
-                }
+                case States.RunAway:
+                    {
+                        print("Switchstates");
+                        runAway();
+                        break;
+                    }
+                case States.Damaged:
+                    {
 
-            case States.RunAway:
-                {
-					print("Switchstates");
-                    runAway();
-                    break;
-                }
-            case States.Damaged:
-                {
+                        break;
+                    }
 
-                    break;
-                }
+                case States.Dizzy:
+                    {
+                        runAway();
+                        break;
+                    }
+            }
 
-            case States.Dizzy:
-                {
-                    Dizzy();
-                    break;
-                }
+
+
         }
-
-
-
     }
+
+       
 
 
 
@@ -331,6 +387,7 @@ public class AI : MonoBehaviour
             }
 
             enemy_AI.isStopped = false;    //Sets the navmesh bool 
+            //this.gameObject.transform.LookAt(Target.transform);
             enemy_AI.SetDestination(Target.position); //Sets the navmesh destination
         }
 
@@ -353,17 +410,18 @@ public class AI : MonoBehaviour
 
         if (hasHit == false) //If the AI hasn't hit recently
         {
-
+          
+            this.gameObject.transform.LookAt(hitRB.transform);
             hitRandom = Random.Range(0, 20); //Creates a random number between 0 and 20
 
-            if (hitRandom >= 0 && hitRandom <= 10) //If the random number is between 0 and 10, do a normal attack
+            if (hitRandom >= 0 && hitRandom <= 5) //If the random number is between 0 and 10, do a normal attack
             {
                 if (hitTarget.dizzy == false) //Finds whether the target is considered dizzy, to determine knockback
                 {
                     if (hitTarget.Health <= 0) //Different knockback values dependant on the target Health
                     {
 
-
+						player_Anim.Right_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
                         hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
                         hitTarget.previousHealth = Health;
@@ -377,7 +435,7 @@ public class AI : MonoBehaviour
                     if (hitTarget.Health < 50 && hitTarget.Health > 0)
                     {
 
-
+						player_Anim.Right_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * 200f);
                         hitTarget.previousHealth = Health;
@@ -391,7 +449,7 @@ public class AI : MonoBehaviour
                     if (hitTarget.Health >= 50)
                     {
 
-
+						player_Anim.Right_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +200f);
                         hitTarget.previousHealth = Health;
@@ -410,7 +468,7 @@ public class AI : MonoBehaviour
                     if (hitTarget.Health <= 0)
                     {
 
-
+						player_Anim.Right_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +4000f);
                         hitTarget.previousHealth = Health;
@@ -424,7 +482,7 @@ public class AI : MonoBehaviour
                     if (hitTarget.Health < 50 && hitTarget.Health > 0)
                     {
 
-
+						player_Anim.Right_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +300f);
                         hitTarget.previousHealth = Health;
@@ -438,7 +496,7 @@ public class AI : MonoBehaviour
                     if (hitTarget.Health >= 50)
                     {
 
-
+						player_Anim.Right_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +300f);
                         hitTarget.previousHealth = Health;
@@ -451,58 +509,58 @@ public class AI : MonoBehaviour
                 }
             }
 
-            if (hitRandom >= 11) //If the random number rolls above 10 then it is considered a critical/charged hit
+            if (hitRandom >= 6) //If the random number rolls above 10 then it is considered a critical/charged hit
             {
 
 
-                m_renderer.material = yellow;
+                //m_renderer.material = yellow;
                 if (hitTimer > 2)
                 {
                     if (hitTarget.Health <= 0)
                     {
 
-
+                        player_Anim.Left_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +4000f);
-                        m_renderer.material = current;
+                        //m_renderer.material = current;
                         hitTimer = 0;
                         hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 20;
+                        hitTarget.Health -= 10;
                         hasHit = true;
                         hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 20;
+						hitTarget.HPBarHitValue = 10;
 						hitTarget.enemy_AI.enabled = false;
                     }
 
                     if (hitTarget.Health < 50 && hitTarget.Health > 0)
                     {
 
-
+                        player_Anim.Left_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +200f);
-                        m_renderer.material = current;
+                        //m_renderer.material = current;
                         hitTimer = 0;
                         hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 20;
+                        hitTarget.Health -= 10;
                         hasHit = true;
                         hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 20;
+						hitTarget.HPBarHitValue = 10;
 						hitTarget.enemy_AI.enabled = false;
                     }
 
                     if (hitTarget.Health >= 50)
                     {
 
-
+                        player_Anim.Left_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +200f);
-                        m_renderer.material = current;
+                        //m_renderer.material = current;
                         hitTimer = 0;
                         hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 20;
+                        hitTarget.Health -= 10;
                         hasHit = true;
                         hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 20;
+						hitTarget.HPBarHitValue = 10;
                     }
 
 
@@ -513,46 +571,46 @@ public class AI : MonoBehaviour
                     if (hitTarget.Health <= 0)
                     {
 
-
+                        player_Anim.Left_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +4000f);
-                        m_renderer.material = current;
+                        //m_renderer.material = current;
                         hitTimer = 0;
                         hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 20;
+                        hitTarget.Health -= 10;
                         hasHit = true;
                         hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 20;
+						hitTarget.HPBarHitValue = 10;
                     }
 
                     if (hitTarget.Health < 50 && hitTarget.Health > 0)
                     {
 
-
+                        player_Anim.Left_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +300f);
-                        m_renderer.material = current;
+                        //m_renderer.material = current;
                         hitTimer = 0;
                         hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 20;
+                        hitTarget.Health -= 10;
                         hasHit = true;
                         hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 20;
+						hitTarget.HPBarHitValue = 10;
                     }
 
                     if (hitTarget.Health >= 50)
                     {
 
-
+                        player_Anim.Left_Punch();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +300f);
-                        m_renderer.material = current;
+                       //m_renderer.material = current;
                         hitTimer = 0;
                         hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 20;
+                        hitTarget.Health -= 10;
                         hasHit = true;
                         hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 20;
+						hitTarget.HPBarHitValue = 10;
                     }
                 }
 
@@ -574,7 +632,7 @@ public class AI : MonoBehaviour
 
     public void Dizzy()
     {
-        enemy_AI.enabled = false;
+        CurrentState = States.RunAway;
 		
     }
 
@@ -591,54 +649,105 @@ public class AI : MonoBehaviour
 			if(hitTarget.Health <= Health)
 			{
 				CurrentState = States.Move;
+                print("Chasing");
 			}
 			
 			if(hitTarget.Health > Health)
 			{
+                print("Running");
 				RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
 				
-				Waypointer way = wayPointGO.GetComponent<Waypointer>();
+				
+                print("Waypointed");
 				if (AINumber == 1)
 				{
-                wayPointGO = GameObject.Find("Waypoint_AI1");
+					try
+					{
+						wayPointGO = GameObject.Find("Waypoint_AI1");
+                        print("Found run way");
+                        print(wayPointGO.name);
+					}
+					catch
+					{
+						print("NO RUN WAYPOINT FOUND");
+					}
 				}
 				else if (AINumber == 2)
 				{
-                wayPointGO = GameObject.Find("Waypoint_AI2");
+                try
+					{
+						wayPointGO = GameObject.Find("Waypoint_AI2");
+					}
+					catch
+					{
+						print("NO WAYPOINT FOUND");
+					}
 				}
 				else if (AINumber == 3)
 				{
-                wayPointGO = GameObject.Find("Waypoint_AI3");
+                try
+					{
+						wayPointGO = GameObject.Find("Waypoint_AI3");
+					}
+					catch
+					{
+						print("NO WAYPOINT FOUND");
+					}
 				}
 				else if (AINumber == 4)
 				{
-                wayPointGO = GameObject.Find("Waypoint_AI4");
+                try
+					{
+						wayPointGO = GameObject.Find("Waypoint_AI4");
+					}
+					catch
+					{
+						print("NO WAYPOINT FOUND");
+					}
 				}
-				BoxCollider waybox = wayPointGO.GetComponent<BoxCollider>();
-				waybox.enabled = true;
-			if (way.Reset == true)
-				{
-					Destroy(wayPointGO);
-                    wayPoint = false;
-					RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
-					print("Col");
-					
 
-				}
-			else if (way.Reset == false)
-				{
-					enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
-					enemy_AI.isStopped = false;
-                    NavMeshPath path = new NavMeshPath();
-                    enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
-                            if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
-                            {
 
-                                Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
-                                wayPoint = false;
-							}
-				    
-				}
+                if (wayPointGO != null)
+                {
+                    Waypointer way = wayPointGO.GetComponent<Waypointer>();
+                    BoxCollider waybox = wayPointGO.GetComponent<BoxCollider>();
+                    waybox.enabled = true;
+                    print("Collider found");
+
+                    if (way.Reset == true)
+                    {
+                        Destroy(wayPointGO);
+                        wayPoint = false;
+                        RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
+                        print("Col");
+
+
+                    }
+                    else if (way.Reset == false)
+                    {
+                        print("WTFGUYS");
+
+                        enemy_AI.isStopped = false;
+                        enemy_AI.speed = 5;
+                        NavMeshPath path = new NavMeshPath();
+                        enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
+                        print("LMAO");
+                        if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
+                        {
+                            print("Hellotehre;");
+                            Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
+                            wayPoint = false;
+                        }
+                        if (path.status == NavMeshPathStatus.PathComplete)
+                        {
+                            enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
+                        }
+                    }
+
+
+
+                }  
+				
 			}
 			
 		}
@@ -707,11 +816,11 @@ public class AI : MonoBehaviour
     public void RandomNavSphereWaypoint(Vector3 origin, float dist, int layermask)     //Used in creating a randomly positioned Waypoint around the AI units
     {
         Vector3 randDirection = this.gameObject.transform.position + Random.insideUnitSphere * dist; // Origin + (Random point * Distance allowed)    Takes the AI unit as an origin point for the circle, then finds a random point within a set distance and sets it to the vector3
-        if (randDirection.y < 3.5 || randDirection.y >= 5)   //If the random point is below or above the arena floor then create a new point
+        if (randDirection.y < 0 || randDirection.y >= 3)   //If the random point is below or above the arena floor then create a new point
         {
             randDirection = this.gameObject.transform.position + Random.insideUnitSphere * dist;
         }
-        else if (randDirection.y >= 4.5 || randDirection.y <= 6) //If within allowed bounds then continue
+        else if (randDirection.y >= 0.5 || randDirection.y <= 1) //If within allowed bounds then continue
         {
             if (wayPoint == false) //If no linked waypoint is active on the scene
             {
