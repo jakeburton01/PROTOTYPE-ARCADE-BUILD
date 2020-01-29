@@ -8,19 +8,20 @@ public class Timer : MonoBehaviour
 
 
     public Canvas canvas;
-    float roundTimerMins = 1f;
+    public float roundTimerMins = 1f;
     float roundTimerSeconds = 0f;
     public Text timerText;
     public Text roundOverText;
     bool finalSeconds;
+    bool timerStop;
 
 
     void Start()
     {
-        roundTimerSeconds = 20f;
-        roundTimerMins = 0f;
+        roundTimerSeconds = 0f;
         roundOverText.enabled = false;
         finalSeconds = false;
+        timerStop = false;
 
 
 
@@ -29,7 +30,15 @@ public class Timer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        roundTimerSeconds -= Time.deltaTime;
+        if(timerStop)
+        {
+            roundTimerSeconds = 0;
+        }
+        else
+        {
+            roundTimerSeconds -= Time.deltaTime;
+        } 
+
         timerText.text = string.Format("{0:00}:{1:00}", roundTimerMins, roundTimerSeconds);
 
         if (roundTimerMins > 1f && roundTimerSeconds < 0f)
@@ -55,8 +64,9 @@ public class Timer : MonoBehaviour
         }
 
 
-        if(roundTimerMins < 0f && roundTimerSeconds < 0f)
+        if(roundTimerMins <= 0f && roundTimerSeconds <= 0f)
         {
+            timerStop = true;
             roundOverText.enabled = true;
         }
 
