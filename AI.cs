@@ -65,11 +65,14 @@ public class AI : MonoBehaviour
     public bool HPBarSet;
 	public int HPBarHitValue;
 
+    public Healthblocks HPUIScript;
+    private GameObject HPUIReference;
     private CharacterAnimation player_Anim;
 
     void Start()
     {
         //Loading in all the basic components and declaring variables
+
         enemy_AI = GetComponent<NavMeshAgent>();
         CurrentState = States.Search;
         previousHealth = Health;
@@ -85,6 +88,26 @@ public class AI : MonoBehaviour
         HPBarSet = false;
 		HPBarHitValue = 0;
         player_Anim = GetComponent<CharacterAnimation>();
+        if (AINumber == 1)
+        {
+            HPUIReference = GameObject.Find("AI1Hold");
+            HPUIScript = HPUIReference.GetComponent<Healthblocks>();
+        }
+        if (AINumber == 2)
+        {
+            HPUIReference = GameObject.Find("AI2Hold");
+            HPUIScript = HPUIReference.GetComponent<Healthblocks>();
+        }
+        if (AINumber == 3)
+        {
+            HPUIReference = GameObject.Find("AI3Hold");
+            HPUIScript = HPUIReference.GetComponent<Healthblocks>();
+        }
+        if (AINumber == 4)
+        {
+            HPUIReference = GameObject.Find("AI4Hold");
+            HPUIScript = HPUIReference.GetComponent<Healthblocks>();
+        }
     }
 
     // Update is called once per frame
@@ -405,6 +428,7 @@ public class AI : MonoBehaviour
 
     public void Hit()
     {
+       
         AI hitTarget = TargetObj.GetComponent<AI>();  //Finds the AI script on the hit enemy, in order to find and manipulate AI variables      ###SEPERATE SCRIPT WILL NEED TO BE FOUND FOR A PLAYER HIT###
         Rigidbody hitRB = hitTarget.GetComponent<Rigidbody>();  //Finds the rigid body attatched to the target, used for knockback
 
@@ -422,6 +446,7 @@ public class AI : MonoBehaviour
                     {
 
 						player_Anim.Right_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
                         hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
                         hitTarget.previousHealth = Health;
@@ -436,6 +461,7 @@ public class AI : MonoBehaviour
                     {
 
 						player_Anim.Right_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * 200f);
                         hitTarget.previousHealth = Health;
@@ -450,6 +476,7 @@ public class AI : MonoBehaviour
                     {
 
 						player_Anim.Right_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +200f);
                         hitTarget.previousHealth = Health;
@@ -469,6 +496,7 @@ public class AI : MonoBehaviour
                     {
 
 						player_Anim.Right_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +4000f);
                         hitTarget.previousHealth = Health;
@@ -483,6 +511,7 @@ public class AI : MonoBehaviour
                     {
 
 						player_Anim.Right_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +300f);
                         hitTarget.previousHealth = Health;
@@ -497,6 +526,7 @@ public class AI : MonoBehaviour
                     {
 
 						player_Anim.Right_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +300f);
                         hitTarget.previousHealth = Health;
@@ -520,6 +550,7 @@ public class AI : MonoBehaviour
                     {
 
                         player_Anim.Left_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +4000f);
                         //m_renderer.material = current;
@@ -536,6 +567,7 @@ public class AI : MonoBehaviour
                     {
 
                         player_Anim.Left_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +200f);
                         //m_renderer.material = current;
@@ -552,6 +584,7 @@ public class AI : MonoBehaviour
                     {
 
                         player_Anim.Left_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +200f);
                         //m_renderer.material = current;
@@ -572,6 +605,7 @@ public class AI : MonoBehaviour
                     {
 
                         player_Anim.Left_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +4000f);
                         //m_renderer.material = current;
@@ -587,6 +621,7 @@ public class AI : MonoBehaviour
                     {
 
                         player_Anim.Left_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +300f);
                         //m_renderer.material = current;
@@ -602,6 +637,7 @@ public class AI : MonoBehaviour
                     {
 
                         player_Anim.Left_Punch();
+                        HPUIScript.NormalDamage();
                         moveDirection = hitTarget.transform.position - this.transform.position;
                         hitRB.AddForce(moveDirection.normalized * +300f);
                        //m_renderer.material = current;
