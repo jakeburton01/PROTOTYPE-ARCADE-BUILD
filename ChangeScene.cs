@@ -1,9 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.IO;
 
 
@@ -13,7 +14,11 @@ public class ChangeScene : MonoBehaviour
     public string tempRead;
     public string readOut;
 
+    public Dropdown dropdown1;
+    public Dropdown dropdown2;
     public GameObject TempGameObject;
+    public Text HoldText;
+    public Text TempText;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,15 +35,28 @@ public class ChangeScene : MonoBehaviour
         }
     }
 
+    public void SetWriteValue()
+    {
+        HoldText.text = HoldText.text + dropdown1.value.ToString();
+        HoldText.text = HoldText.text + dropdown2.value.ToString();
+        print(HoldText.text);
+        WriteString(HoldText.text);
+
+        SceneManager.LoadScene("SampleScene");
+
+    }
+
+    
+
     public void ReadString(string input)
     {
 
         path = "Assets/TextFiles/SceneChange.txt";
         StreamReader reader = new StreamReader(path);
-        readOut = reader.ReadLine();
+        readOut = reader.ReadToEnd();
         reader.Close();
-        tempRead = readOut[0].ToString();
-        print(readOut);
+        tempRead = readOut[1].ToString();
+        print(readOut.Length);
         print(tempRead);
         InitializeObjects(readOut);
     }
@@ -47,10 +65,10 @@ public class ChangeScene : MonoBehaviour
     {
         string x = input;
 
-        x = input[0].ToString();
+        x = input[1].ToString();
         ActivatePlayers(x);
 
-        x = input[1].ToString();
+        x = input[2].ToString();
         ActivateAI(x);
 
     }
