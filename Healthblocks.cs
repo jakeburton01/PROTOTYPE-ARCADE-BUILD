@@ -51,7 +51,7 @@ public class Healthblocks : MonoBehaviour
     {
      //   if(segments.Count > 0)                     EDIT BY STEVEN, ALL OF THE UPDATE FUNCTION SHOULD BE STOPPED WHEN THE SEGMENTS REACH 0
      //   {
-     //     EITHER ENTIRE UPDATE FUNCTION DROPPED HERE OR DESTROY/DISABLE THE GAMEOBJECT
+     //      Destroy(this.gameObject);       EITHER ENTIRE UPDATE FUNCTION DROPPED HERE OR DESTROY/DISABLE THE GAMEOBJECT
      //   }
         i = segments.Count - 1;
         regenTimer += Time.deltaTime;
