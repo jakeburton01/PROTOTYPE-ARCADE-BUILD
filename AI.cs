@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using System.Linq;
 using UnityEngine.AI;
+
 
 public class AI : MonoBehaviour
 {
@@ -130,6 +132,12 @@ public class AI : MonoBehaviour
 
         else if (enemy_AI.enabled == true)
         {
+            if(HPUIScript.AIRegen == true)
+            {
+                Health = Health + 10;
+                HPUIScript.AIRegen = false;
+            }
+
             if (enemy_AI.isStopped == false)
             {
                 player_Anim.Walk(true);
@@ -359,6 +367,8 @@ public class AI : MonoBehaviour
 
     private void Search()
     {
+
+        Destroy(wayPointGO);
 		//Uses an integer to define what search function it follows, can be set in code and editor
         if (Type == 1)
         {
@@ -428,229 +438,46 @@ public class AI : MonoBehaviour
 
     public void Hit()
     {
-       
-        AI hitTarget = TargetObj.GetComponent<AI>();  //Finds the AI script on the hit enemy, in order to find and manipulate AI variables      ###SEPERATE SCRIPT WILL NEED TO BE FOUND FOR A PLAYER HIT###
-        Rigidbody hitRB = hitTarget.GetComponent<Rigidbody>();  //Finds the rigid body attatched to the target, used for knockback
+        if(TargetObj.tag == "Enemy")
+        {
+              //Finds the AI script on the hit enemy, in order to find and manipulate AI variables
+        }
+             
+        Rigidbody hitRB = TargetObj.GetComponent<Rigidbody>();  //Finds the rigid body attatched to the target, used for knockback
 
         if (hasHit == false) //If the AI hasn't hit recently
         {
           
             this.gameObject.transform.LookAt(hitRB.transform);
             hitRandom = Random.Range(0, 20); //Creates a random number between 0 and 20
-
-            if (hitRandom >= 0 && hitRandom <= 5) //If the random number is between 0 and 10, do a normal attack
+            if (TargetObj.tag == "Enemy")
             {
-                if (hitTarget.dizzy == false) //Finds whether the target is considered dizzy, to determine knockback
+                AI hitTarget = TargetObj.GetComponent<AI>();
+                if (hitRandom >= 0 && hitRandom <= 5) //If the random number is between 0 and 10, do a normal attack
                 {
-                    if (hitTarget.Health <= 0) //Different knockback values dependant on the target Health
-                    {
 
-						player_Anim.Right_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
-                        hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;  //Current target health is reduced by 10 on a normal hit
-                        hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-						hitTarget.enemy_AI.enabled = false;
-                    }
-
-                    if (hitTarget.Health < 50 && hitTarget.Health > 0)
-                    {
-
-						player_Anim.Right_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * 200f);
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-						hitTarget.enemy_AI.enabled = false;
-                    }
-
-                    if (hitTarget.Health >= 50)
-                    {
-
-						player_Anim.Right_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +200f);
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-						hitTarget.enemy_AI.enabled = false;
-                    }
-
+                    player_Anim.Right_Punch();
+                    HPUIScript.NormalDamage();
+                    moveDirection = TargetObj.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
+                    hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
+                    hitTarget.previousHealth = Health;
+                    hitTarget.Health -= 10;  //Current target health is reduced by 10 on a normal hit
+                    hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
+                    hitTarget.HPBarSet = true;
+                    hitTarget.HPBarHitValue = 10;
+                    hitTarget.enemy_AI.enabled = false;
 
                 }
 
-                if (hitTarget.dizzy == true)
-                {
-                    if (hitTarget.Health <= 0)
-                    {
 
-						player_Anim.Right_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +4000f);
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-						hitTarget.enemy_AI.enabled = false;
-                    }
-
-                    if (hitTarget.Health < 50 && hitTarget.Health > 0)
-                    {
-
-						player_Anim.Right_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +300f);
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-						hitTarget.enemy_AI.enabled = false;
-                    }
-
-                    if (hitTarget.Health >= 50)
-                    {
-
-						player_Anim.Right_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +300f);
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-						hitTarget.enemy_AI.enabled = false;
-                    }
-                }
             }
 
-            if (hitRandom >= 6) //If the random number rolls above 10 then it is considered a critical/charged hit
+            if(TargetObj.tag == "Player")
             {
-
-
-                //m_renderer.material = yellow;
-                if (hitTimer > 2)
-                {
-                    if (hitTarget.Health <= 0)
-                    {
-
-                        player_Anim.Left_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +4000f);
-                        //m_renderer.material = current;
-                        hitTimer = 0;
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-						hitTarget.enemy_AI.enabled = false;
-                    }
-
-                    if (hitTarget.Health < 50 && hitTarget.Health > 0)
-                    {
-
-                        player_Anim.Left_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +200f);
-                        //m_renderer.material = current;
-                        hitTimer = 0;
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-						hitTarget.enemy_AI.enabled = false;
-                    }
-
-                    if (hitTarget.Health >= 50)
-                    {
-
-                        player_Anim.Left_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +200f);
-                        //m_renderer.material = current;
-                        hitTimer = 0;
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-                    }
-
-
-                }
-
-                if (hitTarget.dizzy == true) 
-                {
-                    if (hitTarget.Health <= 0)
-                    {
-
-                        player_Anim.Left_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +4000f);
-                        //m_renderer.material = current;
-                        hitTimer = 0;
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-                    }
-
-                    if (hitTarget.Health < 50 && hitTarget.Health > 0)
-                    {
-
-                        player_Anim.Left_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +300f);
-                        //m_renderer.material = current;
-                        hitTimer = 0;
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-                    }
-
-                    if (hitTarget.Health >= 50)
-                    {
-
-                        player_Anim.Left_Punch();
-                        HPUIScript.NormalDamage();
-                        moveDirection = hitTarget.transform.position - this.transform.position;
-                        hitRB.AddForce(moveDirection.normalized * +300f);
-                       //m_renderer.material = current;
-                        hitTimer = 0;
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;
-                        hasHit = true;
-                        hitTarget.HPBarSet = true;
-						hitTarget.HPBarHitValue = 10;
-                    }
-                }
-
+              Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
+                hitHPScript.NormalDamage();
             }
+            
         }
 
 
@@ -913,8 +740,12 @@ public class AI : MonoBehaviour
     public GameObject FindClosestEnemy()
     {
 		print("Into closest");
-        GameObject[] gos; //Creates an empty array for game objects to be placed into 
-        gos = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
+        GameObject[] AIGo;
+        GameObject[] PlayerGO;
+        GameObject[] gos;//Creates an empty array for game objects to be placed into 
+        AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
+        PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        gos = AIGo.Concat(PlayerGO).ToArray();
         GameObject closest = null; //Initialises the return game object
         float distance = Mathf.Infinity; //Initialises a temporary float to measure distance
         Vector3 position = transform.position; //Initialises a temporary vector 3, starts as the vector 3 of this AI unit
@@ -939,11 +770,16 @@ public class AI : MonoBehaviour
     {
         List<GameObject> randomList = new List<GameObject>(); //Creates a new list that fits in gameobjects
         GameObject[] re; //Creates an Array that allows for gameobjects
-
-
+        GameObject[] AIGo;
+        GameObject[] PlayerGO;
+        
+        AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
+        PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+         
+        re = AIGo.Concat(PlayerGO).ToArray();
         GameObject randomEnemy = null; //Initialises an empty game object variable
 
-        foreach (GameObject go in GameObject.FindGameObjectsWithTag("Enemy")) //Fill the array with all gameobjects tagged as "enemy", then move through each in this array
+        foreach (GameObject go in re) //Fill the array with all gameobjects tagged as "enemy", then move through each in this array
         {
             if (go.Equals(this.gameObject)) //If the game object is the one linked to this instance of code, then don't add it to the list
                 continue;
