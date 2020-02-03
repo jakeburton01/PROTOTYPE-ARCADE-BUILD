@@ -24,15 +24,16 @@ public class ChangeScene : MonoBehaviour
     {
        
         path = Application.dataPath.ToString();
+        if(SceneManager.GetActiveScene().name == "SampleScene")
+        {
+            ReadString("");
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown("l"))
-        {
-            ReadString("");
-        }
+        
     }
 
     public void SetWriteValue()
