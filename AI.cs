@@ -17,7 +17,7 @@ public class AI : MonoBehaviour
 
     public int Type; //Decides what type of search algorithm is used   (Type 1 = Closest, Type 2 = random,  Type 3 = lowest HP [not implemented])
 
-    private enum States { Idle, Search, Move, RunAway, Hit, Damaged, Dizzy }         //Should represent the drawn state chart
+    private enum States { Idle, Search, Move, RunAway, Hit, Damaged, Dizzy }         //Should represent the drawn state chart      (Dizzy/Damaged not currently implemented)
 
     [SerializeField]
     private States CurrentState; //To dictate which state the script should move to
@@ -61,15 +61,15 @@ public class AI : MonoBehaviour
 
     public float hpSearchcheck; //Used for a set value within the lowest HP search function
 
-    public float waypointToEnemyDistance;
+    public float waypointToEnemyDistance; //Distance between current target and current waypoint, used in runAway (unsure if actually used due to it being old math I was testing)
 
 
-    public bool HPBarSet;
-	public int HPBarHitValue;
+    public bool HPBarSet; //If hit this is set to stop it from calling a hit every frame
+	public int HPBarHitValue; //No idea
 
-    public Healthblocks HPUIScript;
-    private GameObject HPUIReference;
-    private CharacterAnimation player_Anim;
+    public Healthblocks HPUIScript; //This finds the script for the healthbar that will be attached to this unit
+    private GameObject HPUIReference; //Finds the actual health bar object connected to this AI
+    private CharacterAnimation player_Anim;   //Finds the component inside the AI prefab for animation
 
     void Start()
     {
@@ -90,7 +90,7 @@ public class AI : MonoBehaviour
         HPBarSet = false;
 		HPBarHitValue = 0;
         player_Anim = GetComponent<CharacterAnimation>();
-        if (AINumber == 1)
+        if (AINumber == 1) //AI number defined in inspector, but will be defined through instantiation later.
         {
             HPUIReference = GameObject.Find("AI1Hold");
             HPUIScript = HPUIReference.GetComponent<Healthblocks>();
@@ -113,7 +113,7 @@ public class AI : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void Update()    //Probably need to move things out of update cause its a cluttered mess of constant checking
     {
         /*GameObject[] finder;
         finder = GameObject.FindGameObjectsWithTag("Enemy");
@@ -127,31 +127,31 @@ public class AI : MonoBehaviour
             {
                 enemy_AI.enabled = true;
                 timer = 0;
-            }
+            } //If the NavMeshAgent is turned off (generally from being hit) it spends 2 seconds before it turns itself back on   (Old part of dizzy function)
         }
 
         else if (enemy_AI.enabled == true)
         {
             if(HPUIScript.AIRegen == true)
             {
-                Health = Health + 10;
-                HPUIScript.AIRegen = false;
+                Health = Health + 10; //If the connected hp script variable is set to true then regen 10 points
+                HPUIScript.AIRegen = false; //Resets the variable
             }
 
             if (enemy_AI.isStopped == false)
             {
-                player_Anim.Walk(true);
+                player_Anim.Walk(true); //If the NavMeshAgent is moving then set the animation to walking
             }
             if (enemy_AI.isStopped)
             {
-                player_Anim.Walk(false);
+                player_Anim.Walk(false); //If the NavMeshAgent isn't moving, then stop the walking animation (likely leading to either a hit or idle animation)
             }
 
 
             if (Input.GetKeyDown("q"))
             {
                 Health -= 10;
-                HPBarSet = true;
+                HPBarSet = true;//DEBUG, need to remove probably
             }
 
 
@@ -208,7 +208,7 @@ public class AI : MonoBehaviour
                             if (AINumber == 1)
                             {
 
-                                try
+                                try //Try catch used to stop having null reference errors
                                 {
                                     wayPointGO = GameObject.Find("Waypoint_AI1");
                                     wayDistance = Vector3.Distance(transform.position, wayPointGO.transform.position);
@@ -259,7 +259,7 @@ public class AI : MonoBehaviour
                             {
 
                                 enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
-                                NavMeshPath path = new NavMeshPath();
+                                NavMeshPath path = new NavMeshPath(); //Creates a temporary path in memory that can be queried
                                 print("Path Found");
                                 enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
                                 if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
@@ -292,9 +292,9 @@ public class AI : MonoBehaviour
                                 CurrentState = States.Dizzy;
 
                                 dizzy = true; //If hit below 50% hp for first time, become dizzy    ###BUGGY###
-                                dizzyCheck = dizzyCheck + 1;
+                                dizzyCheck = dizzyCheck + 1; //Not used currently
                             }
-                            if (dizzy)
+                            if (dizzy) //Ignore for now
                             {
                                 dizzyTimer += Time.deltaTime;
 
@@ -313,7 +313,7 @@ public class AI : MonoBehaviour
                         break;
                     }
 
-                case States.Search:
+                case States.Search: //State machine, unsure if it's required to be inside the update function but its there now
                     {
                         Search();
                         break;
@@ -438,10 +438,10 @@ public class AI : MonoBehaviour
 
     public void Hit()
     {
-        if(TargetObj.tag == "Enemy")
-        {
+        //if(TargetObj.tag == "Enemy")
+        //{
               //Finds the AI script on the hit enemy, in order to find and manipulate AI variables
-        }
+        //}
              
         Rigidbody hitRB = TargetObj.GetComponent<Rigidbody>();  //Finds the rigid body attatched to the target, used for knockback
 
@@ -450,21 +450,21 @@ public class AI : MonoBehaviour
           
             this.gameObject.transform.LookAt(hitRB.transform);
             hitRandom = Random.Range(0, 20); //Creates a random number between 0 and 20
-            if (TargetObj.tag == "Enemy")
+            if (TargetObj.tag == "Enemy") //Checks whether its an AI or Player fighter
             {
                 AI hitTarget = TargetObj.GetComponent<AI>();
                 if (hitRandom >= 0 && hitRandom <= 5) //If the random number is between 0 and 10, do a normal attack
                 {
-
-                    player_Anim.Right_Punch();
-                    HPUIScript.NormalDamage();
+					Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
+                    player_Anim.Right_Punch(); //Plays a punch animation
+                    hitHPScript.NormalDamage(); //Calls the damage script in the enemy's hp script       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CURRENTLY REFERENCING ITS OWN SCRIPT!!!!!!!!!!!!!!!!!!!!!!!!
                     moveDirection = TargetObj.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
                     hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
                     hitTarget.previousHealth = Health;
                     hitTarget.Health -= 10;  //Current target health is reduced by 10 on a normal hit
                     hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
                     hitTarget.HPBarSet = true;
-                    hitTarget.HPBarHitValue = 10;
+                    hitTarget.HPBarHitValue = 10; //Depreciated
                     hitTarget.enemy_AI.enabled = false;
 
                 }
@@ -475,7 +475,8 @@ public class AI : MonoBehaviour
             if(TargetObj.tag == "Player")
             {
               Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
-                hitHPScript.NormalDamage();
+			  player_Anim.Right_Punch();
+              hitHPScript.NormalDamage();
             }
             
         }
@@ -745,7 +746,7 @@ public class AI : MonoBehaviour
         GameObject[] gos;//Creates an empty array for game objects to be placed into 
         AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
         PlayerGO = GameObject.FindGameObjectsWithTag("Player");
-        gos = AIGo.Concat(PlayerGO).ToArray();
+        gos = AIGo.Concat(PlayerGO).ToArray(); //Joins two GameObject arrays to one single array
         GameObject closest = null; //Initialises the return game object
         float distance = Mathf.Infinity; //Initialises a temporary float to measure distance
         Vector3 position = transform.position; //Initialises a temporary vector 3, starts as the vector 3 of this AI unit
@@ -776,7 +777,7 @@ public class AI : MonoBehaviour
         AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
         PlayerGO = GameObject.FindGameObjectsWithTag("Player");
          
-        re = AIGo.Concat(PlayerGO).ToArray();
+        re = AIGo.Concat(PlayerGO).ToArray();//Joins two GameObject arrays to one single array
         GameObject randomEnemy = null; //Initialises an empty game object variable
 
         foreach (GameObject go in re) //Fill the array with all gameobjects tagged as "enemy", then move through each in this array
