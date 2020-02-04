@@ -33,7 +33,7 @@ public class ChangeScene : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     public void SetWriteValue()
@@ -86,16 +86,33 @@ public class ChangeScene : MonoBehaviour
         if (x == "1")
         {
             TempGameObject = GameObject.Find("Player1");
-            TempGameObject.gameObject.SetActive(true);
+            TempGameObject.transform.position = new Vector3(5, 0, 0);
+			
+			TempGameObject = GameObject.Find("Player2");
+            TempGameObject.gameObject.SetActive(false);
+			
+			TempGameObject = GameObject.Find("Player3");
+            TempGameObject.gameObject.SetActive(false);
+			
+			TempGameObject = GameObject.Find("Player4");
+            TempGameObject.gameObject.SetActive(false);
+			
+			
             TempGameObject = null;
         }
         if (x == "2")
         {
             TempGameObject = GameObject.Find("Player1");
-            TempGameObject.gameObject.SetActive(true);
-
-            TempGameObject = GameObject.Find("Player2");
-            TempGameObject.gameObject.SetActive(true);
+            TempGameObject.transform.position = new Vector3(5, 0, 0);
+			
+			TempGameObject = GameObject.Find("Player2");
+            TempGameObject.transform.position = new Vector3(-5, 0, 0);
+			
+			TempGameObject = GameObject.Find("Player3");
+            TempGameObject.gameObject.SetActive(false);
+			
+			TempGameObject = GameObject.Find("Player4");
+            TempGameObject.gameObject.SetActive(false);
 
             TempGameObject = null;
         }
@@ -103,13 +120,16 @@ public class ChangeScene : MonoBehaviour
         if (x == "3")
         {
             TempGameObject = GameObject.Find("Player1");
-            TempGameObject.gameObject.SetActive(true);
-
-            TempGameObject = GameObject.Find("Player2");
-            TempGameObject.gameObject.SetActive(true);
-
-            TempGameObject = GameObject.Find("Player3");
-            TempGameObject.gameObject.SetActive(true);
+            TempGameObject.transform.position = new Vector3(5, 0, 0);
+			
+			TempGameObject = GameObject.Find("Player2");
+            TempGameObject.transform.position = new Vector3(-5, 0, 0);
+			
+			TempGameObject = GameObject.Find("Player3");
+            TempGameObject.transform.position = new Vector3(5, 0, 8);
+			
+			TempGameObject = GameObject.Find("Player4");
+            TempGameObject.gameObject.SetActive(false);
 
             TempGameObject = null;
         }
@@ -117,16 +137,16 @@ public class ChangeScene : MonoBehaviour
         if (x == "4")
         {
             TempGameObject = GameObject.Find("Player1");
-            TempGameObject.gameObject.SetActive(true);
-
-            TempGameObject = GameObject.Find("Player2");
-            TempGameObject.gameObject.SetActive(true);
-
-            TempGameObject = GameObject.Find("Player3");
-            TempGameObject.gameObject.SetActive(true);
-
-            TempGameObject = GameObject.Find("Player4");
-            TempGameObject.gameObject.SetActive(true);
+            TempGameObject.transform.position = new Vector3(5, 0, 0);
+			
+			TempGameObject = GameObject.Find("Player2");
+            TempGameObject.transform.position = new Vector3(-5, 0, 0);
+			
+			TempGameObject = GameObject.Find("Player3");
+            TempGameObject.transform.position = new Vector3(5, 0, 8);
+			
+			TempGameObject = GameObject.Find("Player4");
+            TempGameObject.transform.position = new Vector3(-5, 0, 8);
 
             TempGameObject = null;
         }
@@ -156,7 +176,7 @@ public class ChangeScene : MonoBehaviour
         if(x == "1")
         {
             TempGameObject = GameObject.Find("AI1");
-            TempGameObject.transform.position = new Vector3(6, 0, 0);
+            TempGameObject.transform.position = new Vector3(5, 0, 0);
             TempGameObject.GetComponentInChildren<AI>().enabled = true;
             TempGameObject.GetComponentInChildren<NavMeshAgent>().enabled = true;
 
@@ -175,7 +195,7 @@ public class ChangeScene : MonoBehaviour
         if (x == "2")
         {
             TempGameObject = GameObject.Find("AI1");
-            TempGameObject.transform.position = new Vector3(6, 0, 0);
+            TempGameObject.transform.position = new Vector3(5, 0, 0);
             TempGameObject.GetComponentInChildren<AI>().enabled = true;
             TempGameObject.GetComponentInChildren<NavMeshAgent>().enabled = true;
 
@@ -195,7 +215,7 @@ public class ChangeScene : MonoBehaviour
         if (x == "3")
         {
             TempGameObject = GameObject.Find("AI1");
-            TempGameObject.transform.position = new Vector3(6, 0, 0);
+            TempGameObject.transform.position = new Vector3(5, 0, 0);
             TempGameObject.GetComponentInChildren<AI>().enabled = true;
             TempGameObject.GetComponentInChildren<NavMeshAgent>().enabled = true;
 
@@ -217,7 +237,7 @@ public class ChangeScene : MonoBehaviour
         if (x == "4")
         {
             TempGameObject = GameObject.Find("AI1");
-            TempGameObject.transform.position = new Vector3(6, 0, 0);
+            TempGameObject.transform.position = new Vector3(5, 0, 0);
             TempGameObject.GetComponentInChildren<AI>().enabled = true;
             TempGameObject.GetComponentInChildren<NavMeshAgent>().enabled = true;
 
