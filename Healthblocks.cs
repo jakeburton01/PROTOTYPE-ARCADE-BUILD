@@ -24,7 +24,6 @@ public class Healthblocks : MonoBehaviour
     RawImage SelectedBlock;
     //array of positions that looks at how many blocks of health left through segment list 
     //damage powerup boolean turns true the player is given an increased damage punch which can only be used once and will have to be the next attack 
-    public GameObject Prefab;
 
 
 
@@ -83,12 +82,13 @@ public class Healthblocks : MonoBehaviour
             HealthRegen();
         }
 
+
+        //ignore from HERE 
         if (Input.GetKeyDown("h"))
         {
             HealthPickup();
 
         }
-
         //n key == normal attack - everytime n key pushed down counter increases by 1
         if (Input.GetKeyDown("n"))
         {
@@ -111,11 +111,12 @@ public class Healthblocks : MonoBehaviour
         {
             DamagePickup();
         }
+        //to HERE just here for testing purposes
     }
 
 
 
-
+    //coroutine to make the currently selected block flash 
     public IEnumerator Flashingbar()
     {
         //while blockflashing is true the last health block in the array will be enabled and disabled to give the illusion of it flashing
@@ -134,11 +135,14 @@ public class Healthblocks : MonoBehaviour
         yield return FlashingBlock.color = defaultColor;
     }
 
+    //brings up game over text
     public void GameOver()
     {
         gameOverText.enabled = true;
     }
 
+
+    //basic attack function 
     public void NormalDamage()
     {
         regenTimer = 0f;
@@ -146,7 +150,7 @@ public class Healthblocks : MonoBehaviour
 
         if (neutral)
         {
-
+            // if the damagepowerup boolean is true then do double damage then set boolean to false
             if (damagePowerup)
             {
                 SelectedBlock = segments[i];
@@ -173,6 +177,7 @@ public class Healthblocks : MonoBehaviour
         }
         else
         {
+            // if the damagepowerup boolean is true then do double damage then set boolean to false
             if (damagePowerup)
             {
                 SelectedBlock = segments[i];
@@ -206,11 +211,13 @@ public class Healthblocks : MonoBehaviour
         }
     }
 
+    //function to start the charged timer to determine how long the attack has been charged for 
     public void ChargedTimer()
     {
         chargedTimer += Time.deltaTime;
     }
 
+    //fucntion for the damage for the charged attack 
     public void ChargedDamage()
     {
         //timer is between 2 and 3 seconds so destroys 1 block of health 
@@ -307,6 +314,7 @@ public class Healthblocks : MonoBehaviour
         }
     }
 
+    //function to stop block flashing essentially regenerating the players health
     public void HealthRegen()
     {
         if (blockFlashing == true)
@@ -317,6 +325,7 @@ public class Healthblocks : MonoBehaviour
         }
     }
 
+    // coroutine to determine the length the speed powerup lasts for 
     IEnumerator PowerUpTimer()
     {
         //current speed of player variable = powerupNewSpeed
@@ -327,6 +336,7 @@ public class Healthblocks : MonoBehaviour
 
     }
 
+    // function called when the player picks up the speed powerup 
     void SpeedPickup()
     {
         //originalSpeed = current speed of player variable
@@ -334,11 +344,13 @@ public class Healthblocks : MonoBehaviour
         StartCoroutine(PowerUpTimer());
     }
 
+    // function called when the player picks up the damage powerup 
     void DamagePickup()
     {
         damagePowerup = true;
     }
 
+    // function called when the player picks up the health powerup 
     void HealthPickup()
     {
 
