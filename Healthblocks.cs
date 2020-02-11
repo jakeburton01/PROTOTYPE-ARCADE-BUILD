@@ -10,17 +10,21 @@ public class Healthblocks : MonoBehaviour
     public Color defaultColor;
     public bool blockFlashing;
     public bool neutral;
+    public bool speedPowerup;
+    public bool damagePowerup;
     public float regenTimer;
     int i;
     public float chargedTimer;
     public Text gameOverText;
     public Vector3[] positions;
+    float originalSpeed;
+    public float powerupNewSpeed;
+    public float powerupLength;
     RawImage FlashingBlock;
     RawImage SelectedBlock;
     //array of positions that looks at how many blocks of health left through segment list 
     //damage powerup boolean turns true the player is given an increased damage punch which can only be used once and will have to be the next attack 
-
-
+    public GameObject Prefab;
 
 
 
@@ -40,6 +44,8 @@ public class Healthblocks : MonoBehaviour
         positions[5] = segments[5].transform.position;
         segments.RemoveAt(i);
         FlashingBlock = segments[4];
+        damagePowerup = false;
+        speedPowerup = false;
     }
 
 
@@ -55,7 +61,7 @@ public class Healthblocks : MonoBehaviour
         regenTimer += Time.deltaTime;
         print(FlashingBlock);
 
-        if(blockFlashing)
+        if (blockFlashing)
         {
             FlashingBlock = segments[i];
         }
@@ -74,7 +80,7 @@ public class Healthblocks : MonoBehaviour
         //if 5 seconds have passed since health block began flashing then stop health block flashing(regenerating that health block)
         if (regenTimer >= 10f)
         {
-            HealthRegen(); 
+            HealthRegen();
         }
 
         if (Input.GetKeyDown("h"))
@@ -100,8 +106,12 @@ public class Healthblocks : MonoBehaviour
         {
             ChargedDamage();
         }
-    }
 
+        if(Input.GetKeyDown("d"))
+        {
+            DamagePickup();
+        }
+    }
 
 
 
@@ -136,24 +146,62 @@ public class Healthblocks : MonoBehaviour
 
         if (neutral)
         {
-            //coroutine that makes block flash begins and sets the blockflashing boolean to be true 
-            blockFlashing = true;    
-            StartCoroutine(Flashingbar());
-            neutral = false;
-           
+
+            if (damagePowerup)
+            {
+                SelectedBlock = segments[i];
+                segments.RemoveAt(i);
+                SelectedBlock.enabled = false;
+                int e = segments.Count - 1;
+                RawImage SelectedBlock2 = segments[e];
+                segments.RemoveAt(e);
+                SelectedBlock2.enabled = false; ;
+                chargedTimer = 0f;
+                neutral = true;
+                damagePowerup = false;
+
+            }
+            else
+            {
+                //coroutine that makes block flash begins and sets the blockflashing boolean to be true 
+                blockFlashing = true;
+                StartCoroutine(Flashingbar());
+                neutral = false;
+            }
+
 
         }
         else
         {
-            //couroutine stopped so block stops flashing - meaning the blockfalshing boolean is now false - and the block that was flashing gets destroyed 
-            blockFlashing = false;
-            StopCoroutine(Flashingbar());
-            neutral = true;
-            SelectedBlock = segments[i];
-            segments.RemoveAt(i);
-            SelectedBlock.enabled = false;
-            i = segments.Count - 1;
-            FlashingBlock = segments[i];
+            if (damagePowerup)
+            {
+                SelectedBlock = segments[i];
+                segments.RemoveAt(i);
+                SelectedBlock.enabled = false;
+                int e = segments.Count - 1;
+                RawImage SelectedBlock2 = segments[e];
+                segments.RemoveAt(e);
+                SelectedBlock2.enabled = false;
+                blockFlashing = true;
+                StartCoroutine(Flashingbar());
+                chargedTimer = 0f;
+                regenTimer = 0f;
+                neutral = false;
+                damagePowerup = false;
+            }
+            else
+            {
+
+                //couroutine stopped so block stops flashing - meaning the blockfalshing boolean is now false - and the block that was flashing gets destroyed 
+                blockFlashing = false;
+                StopCoroutine(Flashingbar());
+                neutral = true;
+                SelectedBlock = segments[i];
+                segments.RemoveAt(i);
+                SelectedBlock.enabled = false;
+                i = segments.Count - 1;
+                FlashingBlock = segments[i];
+            }
 
         }
     }
@@ -214,7 +262,7 @@ public class Healthblocks : MonoBehaviour
                 segments.RemoveAt(i);
                 SelectedBlock.enabled = false;
                 int e = segments.Count - 1;
-                RawImage SelectedBlock2 = segments[e];              
+                RawImage SelectedBlock2 = segments[e];
                 segments.RemoveAt(e);
                 SelectedBlock2.enabled = false;
                 chargedTimer = 0f;
@@ -265,8 +313,30 @@ public class Healthblocks : MonoBehaviour
         {
             blockFlashing = false;
             StopCoroutine(Flashingbar());
-            neutral = true;          
+            neutral = true;
         }
+    }
+
+    IEnumerator PowerUpTimer()
+    {
+        //current speed of player variable = powerupNewSpeed
+        yield return new WaitForSeconds(powerupLength);
+        StopCoroutine(PowerUpTimer());
+
+        yield return speedPowerup = false;
+
+    }
+
+    void SpeedPickup()
+    {
+        //originalSpeed = current speed of player variable
+        speedPowerup = true;
+        StartCoroutine(PowerUpTimer());
+    }
+
+    void DamagePickup()
+    {
+        damagePowerup = true;
     }
 
     void HealthPickup()
@@ -274,7 +344,6 @@ public class Healthblocks : MonoBehaviour
 
         if (segments.Count < 6)
         {
-
             if (neutral)
             {
                 var newHealth1 = (RawImage)Instantiate(healthPrefab) as RawImage;
@@ -393,7 +462,9 @@ public class Healthblocks : MonoBehaviour
 
     }
 
-    
+
+
+
 
 
 }
