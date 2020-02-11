@@ -1,0 +1,27 @@
+PLAYER 1:
+Up     UP ARROW
+Down    DOWN ARROW
+Left      LEFT ARROW
+Right   RIGHT ARROW
+Switch 1    LeftCtrl
+Switch 2    LeftALT
+
+
+
+
+
+
+
+
+
+
+
+Player 2:
+Up       w
+Down      s
+Left        a
+Right      d
+
+
+Switch 1      G
+Switch 2     F
