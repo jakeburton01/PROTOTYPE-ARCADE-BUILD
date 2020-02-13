@@ -24,6 +24,11 @@ public class Healthblocks : MonoBehaviour
     RawImage SelectedBlock;
     //array of positions that looks at how many blocks of health left through segment list 
     //damage powerup boolean turns true the player is given an increased damage punch which can only be used once and will have to be the next attack 
+    public bool dizzyIsPlaying;
+    public bool dizzyState = false;
+    public float idleTimer = 5f;
+    private CharacterAnimation _anim;
+    private JoystickMovement _movement;
 
 
 
@@ -45,9 +50,15 @@ public class Healthblocks : MonoBehaviour
         FlashingBlock = segments[4];
         damagePowerup = false;
         speedPowerup = false;
+        _movement = GetComponent<JoystickMovement>();
     }
 
+    void Awake()
+    {
+        _anim = GetComponentInChildren<CharacterAnimation>();
+    }
 
+    
     //if just pressed then normal hit - make one segment flash and then if hit again destroy flashing bar
     //if button held for 2 seconds remove 1 bar straight away 
     //if button held for 3 seconds remove 1 bar and make next bar flash 
@@ -55,10 +66,10 @@ public class Healthblocks : MonoBehaviour
 
     void Update()
     {
-
+        Knockout();
         i = segments.Count - 1;
         regenTimer += Time.deltaTime;
-        print(FlashingBlock);
+        //print(FlashingBlock);
 
         if (blockFlashing)
         {
@@ -68,7 +79,8 @@ public class Healthblocks : MonoBehaviour
         //if healthbar is empty then bring up game over text 
         if (segments.Count == 0)
         {
-            GameOver();
+            //GameOver();
+            dizzyState = true;
         }
 
         if (regenTimer >= 11f)
@@ -107,7 +119,7 @@ public class Healthblocks : MonoBehaviour
             ChargedDamage();
         }
 
-        if(Input.GetKeyDown("d"))
+        if (Input.GetKeyDown("d"))
         {
             DamagePickup();
         }
@@ -474,9 +486,26 @@ public class Healthblocks : MonoBehaviour
 
     }
 
+    public void Knockout()
+    {
+        if (dizzyState == true && idleTimer > 0)
+        {
+            if (!dizzyIsPlaying)
+            {
+                _anim.Dizzy_State();
+                dizzyIsPlaying = true;
+            }
+            
+            idleTimer -= Time.deltaTime;
+        }
+        else
+        {
+            dizzyIsPlaying = false;
+            dizzyState = false;
+            _anim.Idle(true);
+        }
 
 
-
-
-
+    }
+  
 }

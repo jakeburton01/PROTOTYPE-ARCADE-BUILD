@@ -16,6 +16,7 @@ public class Tags
     public const string STRONG_PUNCH_TRIGGER = "StrongPunch";
 
     public const string MOVEMENT = "Movement";
+    public const string IDLE = "Idle";
 
     public const string HIT_ANIMATION = "Hit";
     public const string DIZZY_ANIMATION = "Dizzy";

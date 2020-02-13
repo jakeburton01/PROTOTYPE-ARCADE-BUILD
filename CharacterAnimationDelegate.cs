@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CharacterAnimationDelegate : MonoBehaviour {
 
-    public GameObject left_Arm_Attack_Point, right_Arm_Attack_Point;
+    public GameObject left_Arm_Attack_Point, right_Arm_Attack_Point, strong_Arm_Attack_Point;
 
 
     void Left_Arm_Attack_On()
@@ -33,6 +33,19 @@ public class CharacterAnimationDelegate : MonoBehaviour {
         }
     }
 
+    void Strong_Arm_Attack_On()
+    {
+        strong_Arm_Attack_Point.SetActive(true);
+    }
+
+    void Strong_Arm_Attack_Off()
+    {
+        if (strong_Arm_Attack_Point.activeInHierarchy)
+        {
+            strong_Arm_Attack_Point.SetActive(false);
+        }
+    }
+
     void Left_Arm_Tag_On()
     {
         left_Arm_Attack_Point.tag = Tags.LEFT_PUNCH_TAG;
@@ -52,4 +65,15 @@ public class CharacterAnimationDelegate : MonoBehaviour {
     {
         right_Arm_Attack_Point.tag = Tags.UNTAGGED_TAG;
     }
+
+    void Strong_Arm_Tag_On()
+    {
+        strong_Arm_Attack_Point.tag = Tags.STRONG_PUNCH_TAG;
+    }
+
+    void Strong_Arm_Tag_Off()
+    {
+        strong_Arm_Attack_Point.tag = Tags.UNTAGGED_TAG;
+    }
+
 }
