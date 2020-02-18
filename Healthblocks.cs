@@ -11,7 +11,7 @@ public class Healthblocks : MonoBehaviour
     public bool blockFlashing;
     public bool neutral;
     public bool speedPowerup;
-    public bool damagePowerup;
+    public bool hitByDamagePowerup;
     public float regenTimer;
     int i;
     public float chargedTimer;
@@ -24,11 +24,6 @@ public class Healthblocks : MonoBehaviour
     RawImage SelectedBlock;
     //array of positions that looks at how many blocks of health left through segment list 
     //damage powerup boolean turns true the player is given an increased damage punch which can only be used once and will have to be the next attack 
-    public bool dizzyIsPlaying;
-    public bool dizzyState = false;
-    public float idleTimer = 5f;
-    private CharacterAnimation _anim;
-    private JoystickMovement _movement;
 
 
 
@@ -48,17 +43,11 @@ public class Healthblocks : MonoBehaviour
         positions[5] = segments[5].transform.position;
         segments.RemoveAt(i);
         FlashingBlock = segments[4];
-        damagePowerup = false;
+        hitByDamagePowerup = false;
         speedPowerup = false;
-        _movement = GetComponent<JoystickMovement>();
     }
 
-    void Awake()
-    {
-        _anim = GetComponentInChildren<CharacterAnimation>();
-    }
 
-    
     //if just pressed then normal hit - make one segment flash and then if hit again destroy flashing bar
     //if button held for 2 seconds remove 1 bar straight away 
     //if button held for 3 seconds remove 1 bar and make next bar flash 
@@ -66,10 +55,10 @@ public class Healthblocks : MonoBehaviour
 
     void Update()
     {
-        Knockout();
+
         i = segments.Count - 1;
         regenTimer += Time.deltaTime;
-        //print(FlashingBlock);
+        print(FlashingBlock);
 
         if (blockFlashing)
         {
@@ -79,8 +68,7 @@ public class Healthblocks : MonoBehaviour
         //if healthbar is empty then bring up game over text 
         if (segments.Count == 0)
         {
-            //GameOver();
-            dizzyState = true;
+            GameOver();
         }
 
         if (regenTimer >= 11f)
@@ -163,7 +151,7 @@ public class Healthblocks : MonoBehaviour
         if (neutral)
         {
             // if the damagepowerup boolean is true then do double damage then set boolean to false
-            if (damagePowerup)
+            if (hitByDamagePowerup)
             {
                 SelectedBlock = segments[i];
                 segments.RemoveAt(i);
@@ -174,7 +162,7 @@ public class Healthblocks : MonoBehaviour
                 SelectedBlock2.enabled = false; ;
                 chargedTimer = 0f;
                 neutral = true;
-                damagePowerup = false;
+                hitByDamagePowerup = false;
 
             }
             else
@@ -190,7 +178,7 @@ public class Healthblocks : MonoBehaviour
         else
         {
             // if the damagepowerup boolean is true then do double damage then set boolean to false
-            if (damagePowerup)
+            if (hitByDamagePowerup)
             {
                 SelectedBlock = segments[i];
                 segments.RemoveAt(i);
@@ -204,7 +192,7 @@ public class Healthblocks : MonoBehaviour
                 chargedTimer = 0f;
                 regenTimer = 0f;
                 neutral = false;
-                damagePowerup = false;
+                hitByDamagePowerup = false;
             }
             else
             {
@@ -486,26 +474,17 @@ public class Healthblocks : MonoBehaviour
 
     }
 
-    public void Knockout()
+    private void OnTriggerEnter(Collider collider)
     {
-        if (dizzyState == true && idleTimer > 0)
+        if (collider.gameObject.tag == "SpeedPowerup")
         {
-            if (!dizzyIsPlaying)
-            {
-                _anim.Dizzy_State();
-                dizzyIsPlaying = true;
-            }
-            
-            idleTimer -= Time.deltaTime;
-        }
-        else
-        {
-            dizzyIsPlaying = false;
-            dizzyState = false;
-            _anim.Idle(true);
+            SpeedPickup();
         }
 
+        if(collider.gameObject.tag == "HealthPowerup")
+        {
+            HealthPickup();
+        }
 
     }
-  
 }
