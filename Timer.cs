@@ -14,23 +14,40 @@ public class Timer : MonoBehaviour
     public Text roundOverText;
     bool finalSeconds;
     bool timerStop;
+    public GameObject manager;
+    PowerupSpawn pwrups;
+    bool spawnStarted;
 
 
     void Start()
     {
-        roundTimerSeconds = 0f;
+        roundTimerSeconds = 60f;
         roundOverText.enabled = false;
         finalSeconds = false;
         timerStop = false;
-
-
+        pwrups = manager.GetComponent<PowerupSpawn>();
+        spawnStarted = false;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(timerStop)
+
+        if(roundTimerSeconds <= 40f)
+        {
+            if (spawnStarted == false)
+            {
+                pwrups.StartSpawning();
+                spawnStarted = true;
+            } else
+            {
+
+            }
+        }
+
+
+        if (timerStop)
         {
             roundTimerSeconds = 0;
         }

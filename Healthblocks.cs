@@ -142,7 +142,7 @@ public class Healthblocks : MonoBehaviour
     }
 
 
-    //basic attack function 
+    //basic take damage function 
     public void NormalDamage()
     {
         regenTimer = 0f;
@@ -150,64 +150,22 @@ public class Healthblocks : MonoBehaviour
 
         if (neutral)
         {
-            // if the damagepowerup boolean is true then do double damage then set boolean to false
-            if (hitByDamagePowerup)
-            {
-                SelectedBlock = segments[i];
-                segments.RemoveAt(i);
-                SelectedBlock.enabled = false;
-                int e = segments.Count - 1;
-                RawImage SelectedBlock2 = segments[e];
-                segments.RemoveAt(e);
-                SelectedBlock2.enabled = false; ;
-                chargedTimer = 0f;
-                neutral = true;
-                hitByDamagePowerup = false;
-
-            }
-            else
-            {
-                //coroutine that makes block flash begins and sets the blockflashing boolean to be true 
-                blockFlashing = true;
-                StartCoroutine(Flashingbar());
-                neutral = false;
-            }
-
-
+            //coroutine that makes block flash begins and sets the blockflashing boolean to be true 
+            blockFlashing = true;
+            StartCoroutine(Flashingbar());
+            neutral = false;
         }
         else
         {
-            // if the damagepowerup boolean is true then do double damage then set boolean to false
-            if (hitByDamagePowerup)
-            {
-                SelectedBlock = segments[i];
-                segments.RemoveAt(i);
-                SelectedBlock.enabled = false;
-                int e = segments.Count - 1;
-                RawImage SelectedBlock2 = segments[e];
-                segments.RemoveAt(e);
-                SelectedBlock2.enabled = false;
-                blockFlashing = true;
-                StartCoroutine(Flashingbar());
-                chargedTimer = 0f;
-                regenTimer = 0f;
-                neutral = false;
-                hitByDamagePowerup = false;
-            }
-            else
-            {
-
-                //couroutine stopped so block stops flashing - meaning the blockfalshing boolean is now false - and the block that was flashing gets destroyed 
-                blockFlashing = false;
-                StopCoroutine(Flashingbar());
-                neutral = true;
-                SelectedBlock = segments[i];
-                segments.RemoveAt(i);
-                SelectedBlock.enabled = false;
-                i = segments.Count - 1;
-                FlashingBlock = segments[i];
-            }
-
+            //couroutine stopped so block stops flashing - meaning the blockfalshing boolean is now false - and the block that was flashing gets destroyed 
+            blockFlashing = false;
+            StopCoroutine(Flashingbar());
+            neutral = true;
+            SelectedBlock = segments[i];
+            segments.RemoveAt(i);
+            SelectedBlock.enabled = false;
+            i = segments.Count - 1;
+            FlashingBlock = segments[i];
         }
     }
 
@@ -217,7 +175,7 @@ public class Healthblocks : MonoBehaviour
         chargedTimer += Time.deltaTime;
     }
 
-    //fucntion for the damage for the charged attack 
+    //fucntion for the damage from the charged attack 
     public void ChargedDamage()
     {
         //timer is between 2 and 3 seconds so destroys 1 block of health 
@@ -347,7 +305,7 @@ public class Healthblocks : MonoBehaviour
     // function called when the player picks up the damage powerup 
     void DamagePickup()
     {
-        damagePowerup = true;
+        hitByDamagePowerup = true;
     }
 
     // function called when the player picks up the health powerup 
@@ -474,14 +432,53 @@ public class Healthblocks : MonoBehaviour
 
     }
 
+
+    //function for taking damage from a player who has a damage powerup active 
+    public void TakeDoubleDamage()
+    {
+        if (neutral)
+        {
+            SelectedBlock = segments[i];
+            segments.RemoveAt(i);
+            SelectedBlock.enabled = false;
+            int e = segments.Count - 1;
+            RawImage SelectedBlock2 = segments[e];
+            segments.RemoveAt(e);
+            SelectedBlock2.enabled = false; ;
+            chargedTimer = 0f;
+            neutral = true;
+            hitByDamagePowerup = false;
+
+        }
+        else
+        {
+            SelectedBlock = segments[i];
+            segments.RemoveAt(i);
+            SelectedBlock.enabled = false;
+            int e = segments.Count - 1;
+            RawImage SelectedBlock2 = segments[e];
+            segments.RemoveAt(e);
+            SelectedBlock2.enabled = false;
+            blockFlashing = true;
+            StartCoroutine(Flashingbar());
+            chargedTimer = 0f;
+            regenTimer = 0f;
+            neutral = false;
+            hitByDamagePowerup = false;
+        }
+
+    }
+
     private void OnTriggerEnter(Collider collider)
     {
+        //calls the speed pickup function when the player picks up the speed powerup
         if (collider.gameObject.tag == "SpeedPowerup")
         {
             SpeedPickup();
         }
 
-        if(collider.gameObject.tag == "HealthPowerup")
+        //calls the health pickup function when the player picks up the health powerup
+        if (collider.gameObject.tag == "HealthPowerup")
         {
             HealthPickup();
         }
