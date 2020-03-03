@@ -15,7 +15,6 @@ public class Healthblocks : MonoBehaviour
     public float regenTimer;
     int i;
     public float chargedTimer;
-    public Text gameOverText;
     public Vector3[] positions;
     float originalSpeed;
     public float powerupNewSpeed;
@@ -29,6 +28,8 @@ public class Healthblocks : MonoBehaviour
     public float idleTimer = 5f;
     private CharacterAnimation _anim;
     private JoystickMovement _movement;
+    public GameObject manager;
+    PowerupSpawn pwrups;
 
 
     void Start()
@@ -37,7 +38,6 @@ public class Healthblocks : MonoBehaviour
         i = segments.Count - 1;
         blockFlashing = false;
         regenTimer = 0f;
-        gameOverText.enabled = false;
         neutral = true;
         positions[0] = segments[0].transform.position;
         positions[1] = segments[1].transform.position;
@@ -50,6 +50,7 @@ public class Healthblocks : MonoBehaviour
         hitByDamagePowerup = false;
         speedPowerup = false;
         _movement = GetComponent<JoystickMovement>();
+        pwrups = manager.GetComponent<PowerupSpawn>();
     }
 
     void Awake()
@@ -149,7 +150,7 @@ public class Healthblocks : MonoBehaviour
     //brings up game over text
     public void GameOver()
     {
-        gameOverText.enabled = true;
+
     }
 
 
@@ -513,12 +514,15 @@ public class Healthblocks : MonoBehaviour
         if (collider.gameObject.tag == "SpeedPowerup")
         {
             SpeedPickup();
+            pwrups.SpawnAfterPickup();
+
         }
 
         //calls the health pickup function when the player picks up the health powerup
         if (collider.gameObject.tag == "HealthPowerup")
         {
             HealthPickup();
+            pwrups.SpawnAfterPickup();
         }
 
     }

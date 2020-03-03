@@ -30,10 +30,16 @@ public class PowerupSpawn : MonoBehaviour
         spawnPointsIndex = Random.Range(0, spawnPoints.Length);
         powerupsIndex = Random.Range(0, Powerups.Length);
         Instantiate(Powerups[powerupsIndex], spawnPoints[spawnPointsIndex].position, spawnPoints[spawnPointsIndex].rotation);
+
     }
 
     public void StartSpawning()
     {
         InvokeRepeating("SpawnPowerups", 0, Random.Range(20,30));
+    }
+
+    public void SpawnAfterPickup()
+    {
+        Invoke("SpawnPowerups", Random.Range(5, 10));
     }
 }
