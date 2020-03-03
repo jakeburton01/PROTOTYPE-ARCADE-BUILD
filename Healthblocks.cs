@@ -11,7 +11,7 @@ public class Healthblocks : MonoBehaviour
     public bool blockFlashing;
     public bool neutral;
     public bool speedPowerup;
-    public bool hitByDamagePowerup;
+    public bool damagePowerup;
     public float regenTimer;
     int i;
     public float chargedTimer;
@@ -24,6 +24,11 @@ public class Healthblocks : MonoBehaviour
     RawImage SelectedBlock;
     //array of positions that looks at how many blocks of health left through segment list 
     //damage powerup boolean turns true the player is given an increased damage punch which can only be used once and will have to be the next attack 
+    public bool dizzyIsPlaying;
+    public bool dizzyState = false;
+    public float idleTimer = 5f;
+    private CharacterAnimation _anim;
+    private JoystickMovement _movement;
 
 
 
@@ -43,11 +48,17 @@ public class Healthblocks : MonoBehaviour
         positions[5] = segments[5].transform.position;
         segments.RemoveAt(i);
         FlashingBlock = segments[4];
-        hitByDamagePowerup = false;
+        damagePowerup = false;
         speedPowerup = false;
+        _movement = GetComponent<JoystickMovement>();
     }
 
+    void Awake()
+    {
+        _anim = GetComponentInChildren<CharacterAnimation>();
+    }
 
+    
     //if just pressed then normal hit - make one segment flash and then if hit again destroy flashing bar
     //if button held for 2 seconds remove 1 bar straight away 
     //if button held for 3 seconds remove 1 bar and make next bar flash 
@@ -55,10 +66,10 @@ public class Healthblocks : MonoBehaviour
 
     void Update()
     {
-
+        Knockout();
         i = segments.Count - 1;
         regenTimer += Time.deltaTime;
-        print(FlashingBlock);
+        //print(FlashingBlock);
 
         if (blockFlashing)
         {
@@ -68,7 +79,8 @@ public class Healthblocks : MonoBehaviour
         //if healthbar is empty then bring up game over text 
         if (segments.Count == 0)
         {
-            GameOver();
+            //GameOver();
+            dizzyState = true;
         }
 
         if (regenTimer >= 11f)
@@ -142,7 +154,7 @@ public class Healthblocks : MonoBehaviour
     }
 
 
-    //basic take damage function 
+    //basic attack function 
     public void NormalDamage()
     {
         regenTimer = 0f;
@@ -150,22 +162,69 @@ public class Healthblocks : MonoBehaviour
 
         if (neutral)
         {
-            //coroutine that makes block flash begins and sets the blockflashing boolean to be true 
-            blockFlashing = true;
-            StartCoroutine(Flashingbar());
-            neutral = false;
+            // if the damagepowerup boolean is true then do double damage then set boolean to false
+            if (damagePowerup)
+            {
+                SelectedBlock = segments[i];
+                segments.RemoveAt(i);
+                SelectedBlock.enabled = false;
+                int e = segments.Count - 1;
+                RawImage SelectedBlock2 = segments[e];
+                segments.RemoveAt(e);
+                SelectedBlock2.enabled = false; ;
+                chargedTimer = 0f;
+                neutral = true;
+                damagePowerup = false;
+                _anim.BeenHit();
+                
+            }
+            else
+            {
+                //coroutine that makes block flash begins and sets the blockflashing boolean to be true 
+                blockFlashing = true;
+                StartCoroutine(Flashingbar());
+                neutral = false;
+                _anim.BeenHit();
+                
+            }
+
+
         }
         else
         {
-            //couroutine stopped so block stops flashing - meaning the blockfalshing boolean is now false - and the block that was flashing gets destroyed 
-            blockFlashing = false;
-            StopCoroutine(Flashingbar());
-            neutral = true;
-            SelectedBlock = segments[i];
-            segments.RemoveAt(i);
-            SelectedBlock.enabled = false;
-            i = segments.Count - 1;
-            FlashingBlock = segments[i];
+            // if the damagepowerup boolean is true then do double damage then set boolean to false
+            if (damagePowerup)
+            {
+                SelectedBlock = segments[i];
+                segments.RemoveAt(i);
+                SelectedBlock.enabled = false;
+                int e = segments.Count - 1;
+                RawImage SelectedBlock2 = segments[e];
+                segments.RemoveAt(e);
+                SelectedBlock2.enabled = false;
+                blockFlashing = true;
+                StartCoroutine(Flashingbar());
+                chargedTimer = 0f;
+                regenTimer = 0f;
+                neutral = false;
+                damagePowerup = false;
+                _anim.BeenHit();
+            }
+            else
+            {
+
+                //couroutine stopped so block stops flashing - meaning the blockfalshing boolean is now false - and the block that was flashing gets destroyed 
+                blockFlashing = false;
+                StopCoroutine(Flashingbar());
+                neutral = true;
+                SelectedBlock = segments[i];
+                segments.RemoveAt(i);
+                SelectedBlock.enabled = false;
+                i = segments.Count - 1;
+                FlashingBlock = segments[i];
+                _anim.BeenHit();
+            }
+
         }
     }
 
@@ -175,7 +234,7 @@ public class Healthblocks : MonoBehaviour
         chargedTimer += Time.deltaTime;
     }
 
-    //fucntion for the damage from the charged attack 
+    //fucntion for the damage for the charged attack 
     public void ChargedDamage()
     {
         //timer is between 2 and 3 seconds so destroys 1 block of health 
@@ -305,7 +364,7 @@ public class Healthblocks : MonoBehaviour
     // function called when the player picks up the damage powerup 
     void DamagePickup()
     {
-        hitByDamagePowerup = true;
+        damagePowerup = true;
     }
 
     // function called when the player picks up the health powerup 
@@ -432,56 +491,26 @@ public class Healthblocks : MonoBehaviour
 
     }
 
-
-    //function for taking damage from a player who has a damage powerup active 
-    public void TakeDoubleDamage()
+    public void Knockout()
     {
-        if (neutral)
+        if (dizzyState == true && idleTimer > 0)
         {
-            SelectedBlock = segments[i];
-            segments.RemoveAt(i);
-            SelectedBlock.enabled = false;
-            int e = segments.Count - 1;
-            RawImage SelectedBlock2 = segments[e];
-            segments.RemoveAt(e);
-            SelectedBlock2.enabled = false; ;
-            chargedTimer = 0f;
-            neutral = true;
-            hitByDamagePowerup = false;
-
+            if (!dizzyIsPlaying)
+            {
+                _anim.Dizzy_State();
+                dizzyIsPlaying = true;
+            }
+            
+            idleTimer -= Time.deltaTime;
         }
         else
         {
-            SelectedBlock = segments[i];
-            segments.RemoveAt(i);
-            SelectedBlock.enabled = false;
-            int e = segments.Count - 1;
-            RawImage SelectedBlock2 = segments[e];
-            segments.RemoveAt(e);
-            SelectedBlock2.enabled = false;
-            blockFlashing = true;
-            StartCoroutine(Flashingbar());
-            chargedTimer = 0f;
-            regenTimer = 0f;
-            neutral = false;
-            hitByDamagePowerup = false;
+            dizzyIsPlaying = false;
+            dizzyState = false;
+            _anim.Idle(true);
         }
+
 
     }
-
-    private void OnTriggerEnter(Collider collider)
-    {
-        //calls the speed pickup function when the player picks up the speed powerup
-        if (collider.gameObject.tag == "SpeedPowerup")
-        {
-            SpeedPickup();
-        }
-
-        //calls the health pickup function when the player picks up the health powerup
-        if (collider.gameObject.tag == "HealthPowerup")
-        {
-            HealthPickup();
-        }
-
-    }
+  
 }
