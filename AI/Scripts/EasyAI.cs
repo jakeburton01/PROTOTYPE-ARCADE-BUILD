@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -64,6 +64,8 @@ public class EasyAI : MonoBehaviour
     public Healthblocks HPUIScript; //This finds the script for the healthbar that will be attached to this unit
     private GameObject HPUIReference; //Finds the actual health bar object connected to this AI
     private CharacterAnimation player_Anim;   //Finds the component inside the AI prefab for animation
+
+    public bool aistopped;
     // Start is called before the first frame update
     void Start()
     {
@@ -73,7 +75,7 @@ public class EasyAI : MonoBehaviour
         CurrentState = States.Search;
         previousHealth = Health;
         m_renderer = this.GetComponent<Renderer>();
-        
+        aistopped = enemy_AI.isStopped;
         hasHit = false;
         hitCooldownTimer = 1;
         hitTimer = 0;
@@ -149,7 +151,13 @@ public class EasyAI : MonoBehaviour
                 hitCooldownTimer = 1;
             }
 
-            if (Health <= 0)
+            if(Health <= 100)
+            {
+                CurrentState = States.RunAway;
+                RunAway();
+            }
+
+           else if (Health <= 0)
             {
                 Destroy(this.gameObject);
                 // enemy_AI.enabled = false;
@@ -216,6 +224,8 @@ public class EasyAI : MonoBehaviour
 
     public void IdleWander()
     {
+        enemy_AI.isStopped = false;
+        
         RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
         if (AINumber == 1)
         {
@@ -228,6 +238,7 @@ public class EasyAI : MonoBehaviour
             catch
             {
                 print("NO WAYPOINT FOUND");
+                IdleWander();
             }
         }
         else if (AINumber == 2)
@@ -240,6 +251,7 @@ public class EasyAI : MonoBehaviour
             catch
             {
                 print("NO WAYPOINT FOUND");
+                IdleWander();
             }
         }
         else if (AINumber == 3)
@@ -252,6 +264,7 @@ public class EasyAI : MonoBehaviour
             catch
             {
                 print("NO WAYPOINT FOUND");
+                IdleWander();
             }
         }
         else if (AINumber == 4)
@@ -264,11 +277,12 @@ public class EasyAI : MonoBehaviour
             catch
             {
                 print("NO WAYPOINT FOUND");
+                IdleWander();
             }
         }
         if (timer <= wanderTimer && wayPointGO != null)
         {
-
+            print("Setting Path");
             enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
             NavMeshPath path = new NavMeshPath(); //Creates a temporary path in memory that can be queried
                                                   //print("Path Found");
@@ -294,16 +308,21 @@ public class EasyAI : MonoBehaviour
 
         if (timer >= wanderTimer)
         {
-            print("Needs to get here");
-            Search();
-            CurrentState = States.Search;//Once the timer reaches its max allowed value, move into search
+            if(CurrentState == States.Idle)
+            {
+                print("Needs to get here");
+                Search();
+                CurrentState = States.Search;//Once the timer reaches its max allowed value, move into search
+            }
         }
+           
     }
 
     public void Search()
     {
         print("into Search");
         Destroy(wayPointGO);
+        wayPoint = false;
         Target = FindClosestEnemy().transform;
         TargetObj = FindClosestEnemy(); //Finds the game object and the transform location of the nearest enemy   [Custom functions]
         if (Target != null)
@@ -374,7 +393,7 @@ public class EasyAI : MonoBehaviour
                     hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
                     hitTarget.HPBarSet = true;
                     hitTarget.HPBarHitValue = 10; //Depreciated
-                    hitTarget.enemy_AI.enabled = false;   ########CAUSING ISSUES#######         //(Need to disable the animation and transform)  hitTarget.enemy_AI.isStopped = true ? 
+                    //hitTarget.enemy_AI.enabled = false;
 
                 }
 
@@ -393,7 +412,9 @@ public class EasyAI : MonoBehaviour
 
         else
         {
+            
             CurrentState = States.Idle;
+            IdleWander();
             timer = 0; //If hasHit is true then switch back into the idle state
         }
     }
@@ -408,12 +429,12 @@ public class EasyAI : MonoBehaviour
             if (hitTarget.Health <= Health)
             {
                 CurrentState = States.Move;
-                // print("Chasing");
+                print("Chasing");
             }
 
             if (hitTarget.Health > Health)
             {
-                //print("Running");
+                print("Running");
                 RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
 
 
