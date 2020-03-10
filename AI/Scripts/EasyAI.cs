@@ -374,7 +374,7 @@ public class EasyAI : MonoBehaviour
                     hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
                     hitTarget.HPBarSet = true;
                     hitTarget.HPBarHitValue = 10; //Depreciated
-                    hitTarget.enemy_AI.enabled = false;
+                    hitTarget.enemy_AI.enabled = false;   ########CAUSING ISSUES#######         //(Need to disable the animation and transform)  hitTarget.enemy_AI.isStopped = true ? 
 
                 }
 
