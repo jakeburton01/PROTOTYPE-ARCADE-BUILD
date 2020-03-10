@@ -649,5 +649,20 @@ public class EasyAI : MonoBehaviour
     }
 
 
+/*public void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "SpeedPowerup")
+        {
+            HPUIScript.SpeedPickup();
+            HPUIScript.pwrups.SpawnAfterPickup();
+        }
+        else if(other.gameObject.tag == "HealthPickup")
+        {
+            HPUIScript.HealthPickup();
+            Health = Health + 10;
+            HPUIScript.pwrups.SpawnAfterPickup();
+        }
+    }*/
+
 
 }
