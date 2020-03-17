@@ -405,6 +405,7 @@ public class EasyAI : MonoBehaviour
                 Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
                 player_Anim.Right_Punch();
                 hitHPScript.NormalDamage();
+                hasHit = true;
             }
 
         }
@@ -416,6 +417,7 @@ public class EasyAI : MonoBehaviour
             CurrentState = States.Idle;
             IdleWander();
             timer = 0; //If hasHit is true then switch back into the idle state
+            
         }
     }
 
