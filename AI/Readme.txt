@@ -18,6 +18,8 @@ Search and hit type is decided by random number.
 
 0-2 are hits 3-5 misses    50% chance to hit    50% chance to miss    Can be changed
 
+Working on powerup searching, likely will be priority based.
+
 
 
 Current Script only uses basic punch as don't want to mess around with extra animations and collision hitboxes before we have our final/close to final models, for sake of not spending time bugfixing something that wont be used.
