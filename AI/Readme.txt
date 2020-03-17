@@ -9,6 +9,16 @@ Rigidbody    (Set to default values)
 Easy AI Script     (Health - 120, Wander radius 10, Wander Timer 5, AI number 1-4, Waypoint prefab will need to be set from waypoint prefab)      (Includes a callable initialization script, but not implemented for startup, needs to be called via change scene script)
 HealthBlocks Script (Element0 = HealthBar   Element1 = Healthbar1 etc)
 
+Hit has 20% chance to hit, 80% chance to miss (animation will play for both)
+
+
+Medium AI same as above:
+Behaviours added: Search for random enemy/different attacks (left hand + Strong hit, Although strong damage needs to be checked on implementation)
+Search and hit type is decided by random number.
+
+0-2 are hits 3-5 misses    50% chance to hit    50% chance to miss    Can be changed
+
+
 
 Current Script only uses basic punch as don't want to mess around with extra animations and collision hitboxes before we have our final/close to final models, for sake of not spending time bugfixing something that wont be used.
 Higher difficulty AI will use different search methods (Random, LowestHP, Closest) which are already coded. 
