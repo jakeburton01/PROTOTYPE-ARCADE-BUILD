@@ -347,13 +347,22 @@ public class MediumAI : MonoBehaviour
 
         if (randomint < 5)
         {
-            Target = FindClosestEnemy().transform;
-            TargetObj = FindClosestEnemy();
+            Target = FindRandomEnemy().transform;
+            TargetObj = FindRandomEnemy();
         }
         if(randomint > 5)
         {
-            Target = FindRandomEnemy().transform;
-            TargetObj = FindRandomEnemy();
+            if(FindPowerup() != null)
+            {
+                Target = FindPowerup().transform;
+                TargetObj = FindPowerup();
+            }
+            else
+            {
+                Target = FindClosestEnemy().transform;
+                TargetObj = FindClosestEnemy();
+            }
+            
         }
          //Finds the game object and the transform location of the nearest enemy   [Custom functions]
         if (Target != null)
@@ -715,6 +724,26 @@ public class MediumAI : MonoBehaviour
             }
         }
 
+    }
+
+
+
+
+
+    public GameObject FindPowerup()
+    {
+        GameObject[] PowerupGo;
+
+        PowerupGo = GameObject.FindGameObjectsWithTag("Powerup");
+        if(PowerupGo[1] != null)
+        {
+            return PowerupGo[1];
+        }
+        else
+        {
+            return null;
+        }
+       
     }
 
 
