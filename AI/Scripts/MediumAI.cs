@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -66,11 +66,15 @@ public class MediumAI : MonoBehaviour
     private CharacterAnimation player_Anim;   //Finds the component inside the AI prefab for animation
 
     public bool aistopped;
+
+    public float gametimer;
+    public float randomint;
+
     // Start is called before the first frame update
     void Start()
     {
 
-
+        gametimer = 0;
         enemy_AI = GetComponent<NavMeshAgent>();
         CurrentState = States.Search;
         previousHealth = Health;
@@ -111,6 +115,8 @@ public class MediumAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        gametimer += Time.deltaTime;
         if (enemy_AI.enabled == false)
         {
 
@@ -151,7 +157,7 @@ public class MediumAI : MonoBehaviour
                 hitCooldownTimer = 1;
             }
 
-            if (Health <= 100)
+            if (Health <= 10 && Health >0)
             {
                 CurrentState = States.RunAway;
                 RunAway();
@@ -325,9 +331,21 @@ public class MediumAI : MonoBehaviour
         print("into Search");
         Destroy(wayPointGO);
         wayPoint = false;
-        float randomint;
-        randomint = Random.Range(0, 10);
-        if(randomint < 5)
+        
+        if(gametimer < 40)
+        {
+            randomint = 1;
+        }
+        if (gametimer >= 40 && gametimer < 120)
+        {
+            randomint = Random.Range(0, 6);
+        }
+        if (gametimer >= 120 && gametimer < 240)
+        {
+            randomint = Random.Range(0, 10);
+        }
+
+        if (randomint < 5)
         {
             Target = FindClosestEnemy().transform;
             TargetObj = FindClosestEnemy();
@@ -407,7 +425,7 @@ public class MediumAI : MonoBehaviour
                         hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
                         hitTarget.HPBarSet = true;
                         hitTarget.HPBarHitValue = 10; //Depreciated
-                                                      //hitTarget.enemy_AI.enabled = false;
+                        print("normalhitright");            //hitTarget.enemy_AI.enabled = false;
 
                     }
 
@@ -438,12 +456,12 @@ public class MediumAI : MonoBehaviour
                         hitHPBarScript.NormalDamage(); //Calls the damage script in the enemy's hp script       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CURRENTLY REFERENCING ITS OWN SCRIPT!!!!!!!!!!!!!!!!!!!!!!!!
                                                        //moveDirection = TargetObj.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
                                                        //hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
-                        hitTarget.previousHealth = Health;
+                        //hitTarget.previousHealth = Health;
                         hitTarget.Health -= 10;  //Current target health is reduced by 10 on a normal hit
                         hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
                         hitTarget.HPBarSet = true;
-                        hitTarget.HPBarHitValue = 10; //Depreciated
-                                                      //hitTarget.enemy_AI.enabled = false;
+                       // hitTarget.HPBarHitValue = 10; //Depreciated
+                        print("normal hit");                      //hitTarget.enemy_AI.enabled = false;
 
                     }
 
@@ -469,14 +487,14 @@ public class MediumAI : MonoBehaviour
                     Healthblocks hitHPBarScript = TargetObj.GetComponent<Healthblocks>();
                     if (hitRandom >= 0 && hitRandom <= 21) //If the random number is between 0 and 10, do a normal attack
                     {
-
+                        print("strong hit");
                         player_Anim.Strong_Punch(); //Plays a punch animation
                         hitHPBarScript.chargedTimer = 3;
                         hitHPBarScript.ChargedDamage(); //Calls the damage script in the enemy's hp script       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CURRENTLY REFERENCING ITS OWN SCRIPT!!!!!!!!!!!!!!!!!!!!!!!!
                                                        //moveDirection = TargetObj.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
                                                        //hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
-                        hitTarget.previousHealth = Health;
-                        hitTarget.Health -= 10;  //Current target health is reduced by 10 on a normal hit
+                        //hitTarget.previousHealth = hitTarget.Health;
+                        hitTarget.Health -= 30;  //Current target health is reduced by 10 on a normal hit
                         hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
                         hitTarget.HPBarSet = true;
                         hitTarget.HPBarHitValue = 10; //Depreciated
@@ -498,18 +516,21 @@ public class MediumAI : MonoBehaviour
 
             if (rand == 3)
             {
+                print("miss");
                 player_Anim.Right_Punch();
                 hasHit = true;
             }
 
             if (rand == 4)
             {
+                print("miss");
                 player_Anim.Left_Punch();
                 hasHit = true;
             }
 
             if (rand == 5)
             {
+                print("miss");
                 player_Anim.Strong_Punch();
                 hasHit = true;
             }
