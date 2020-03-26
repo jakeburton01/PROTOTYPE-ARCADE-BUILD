@@ -1,3 +1,9 @@
+###Current powerup pathfinding requires objects to be tagged with "Powerup", the spawning script spawns them with different tags vs just using different object names###
+
+
+
+
+
 EasyAI Prefab (currently named AI) -
 Transform
 Animator
