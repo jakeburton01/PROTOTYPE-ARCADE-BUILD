@@ -1,3 +1,6 @@
+Director AI must be attached to "GameManager" game object in the scene. This attempts to watch the state of each fighter and find a high threat/priority target for the AI to attack. Currently half implemented for finding players.
+
+
 ###Current powerup pathfinding requires objects to be tagged with "Powerup", the spawning script spawns them with different tags vs just using different object names###
 
 
