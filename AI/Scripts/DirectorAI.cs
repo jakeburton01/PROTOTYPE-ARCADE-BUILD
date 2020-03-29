@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -40,9 +40,19 @@ public class DirectorAI : MonoBehaviour
     public int PriorityTarget;
 
 
+    public Healthblocks test1;
+    public float test1hp;
+
+
+    public float[] priorities;
+
     // Start is called before the first frame update
     void Start()
     {
+        
+        priorities = new float[5];
+        priorities[0] = 1;
+
         Fighter1 = FindFighter(1);
         print("set1");
         Fighter2 = FindFighter(2);
@@ -51,6 +61,7 @@ public class DirectorAI : MonoBehaviour
         print("set3");
         Fighter4 = FindFighter(4);
         print("set4");
+        test1 = GameObject.Find("AI1").GetComponent<Healthblocks>();
 
         Fighter1Priority = 0;
         Fighter1HP = 120;
@@ -66,6 +77,7 @@ public class DirectorAI : MonoBehaviour
         AICheck(FighterAI2, 2);
         AICheck(FighterAI3, 3);
         AICheck(FighterAI4, 4);
+        test1hp = test1.segments.Count();
         CheckPriority();
     }
 
@@ -73,21 +85,22 @@ public class DirectorAI : MonoBehaviour
 
     public void CheckPriority()
     {
-        float[] priorities;
-        priorities = new float[5];
         
-        priorities[0] = Fighter1Priority;
-        priorities[1] = Fighter2Priority;
-        priorities[2] = Fighter3Priority;
-        priorities[3] = Fighter4Priority;
-        priorities[4] = 1;
+
+        
+        priorities[1] = Fighter1Priority;
+        priorities[2] = Fighter2Priority;
+        priorities[3] = Fighter3Priority;
+        priorities[4] = Fighter4Priority;
+        
         
         float maxValue = priorities.Max();
         int maxIndex = priorities.ToList().IndexOf(maxValue);
 
-        PriorityTarget = maxIndex + 1;
-        
-        
+        PriorityTarget = maxIndex;
+
+        priorities[0] = -200;
+
 
 
     }
