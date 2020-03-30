@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -123,6 +123,8 @@ public class HardAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        InvokeRepeating("BreakForPowerups", 0, 5);
 
         gametimer += Time.deltaTime;
         if (enemy_AI.enabled == false)
@@ -890,5 +892,24 @@ public class HardAI : MonoBehaviour
      }
      */
 
+    public void BreakForPowerup()
+    {
+        GameObject returnPowerup;
+        try
+        {
+            returnPowerup = GameObject.FindGameObjectWithTag("Powerup");
+            Target = returnPowerup.transform;
+            TargetObj = returnPowerup;
+            Move();
 
+        }
+        catch
+        {
+           returnPowerup = null;
+        }
+
+
+
+       
+    }
 }
