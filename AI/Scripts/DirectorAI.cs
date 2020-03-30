@@ -8,6 +8,7 @@ public class DirectorAI : MonoBehaviour
     public GameObject Temp;
     public GameObject Fighter1;
     public HardAI FighterAI1;
+    public Healthblocks FighterHealthblocks1;
     public float Fighter1HP;
     public int Fighter1HitsGiven;
     public int Fighter1HitsTaken;
@@ -16,6 +17,7 @@ public class DirectorAI : MonoBehaviour
 
     public GameObject Fighter2;
     public HardAI FighterAI2;
+    public Healthblocks FighterHealthblocks2;
     public float Fighter2HP;
     public int Fighter2HitsGiven;
     public int Fighter2HitsTaken;
@@ -24,6 +26,7 @@ public class DirectorAI : MonoBehaviour
 
     public GameObject Fighter3;
     public HardAI FighterAI3;
+    public Healthblocks FighterHealthblocks3;
     public float Fighter3HP;
     public int Fighter3HitsGiven;
     public int Fighter3HitsTaken;
@@ -32,6 +35,7 @@ public class DirectorAI : MonoBehaviour
 
     public GameObject Fighter4;
     public HardAI FighterAI4;
+    public Healthblocks FighterHealthblocks4;
     public float Fighter4HP;
     public int Fighter4HitsGiven;
     public int Fighter4HitsTaken;
@@ -73,10 +77,44 @@ public class DirectorAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        AICheck(FighterAI1, 1);
-        AICheck(FighterAI2, 2);
-        AICheck(FighterAI3, 3);
-        AICheck(FighterAI4, 4);
+        if(Fighter1.name == "Player1")
+        {
+            PlayerCheck(FighterHealthblocks1, 1);
+        }
+        else if (Fighter1.name == "AI1")
+        {
+            AICheck(FighterAI1, 1);
+        }
+
+        if (Fighter2.name == "Player2")
+        {
+            PlayerCheck(FighterHealthblocks2, 2);
+        }
+        else if (Fighter2.name == "AI2")
+        {
+            AICheck(FighterAI2, 2);
+        }
+        if (Fighter3.name == "Player3")
+        {
+            PlayerCheck(FighterHealthblocks3, 3);
+        }
+        else if (Fighter3.name == "AI3")
+        {
+            AICheck(FighterAI3, 3);
+        }
+        if (Fighter4.name == "Player4")
+        {
+            PlayerCheck(FighterHealthblocks4, 4);
+        }
+        else if (Fighter4.name == "AI4")
+        {
+            AICheck(FighterAI4, 4);
+        }
+
+        
+        
+        
+        
         test1hp = test1.segments.Count();
         CheckPriority();
     }
@@ -105,6 +143,66 @@ public class DirectorAI : MonoBehaviour
 
     }
 
+
+
+    public void PlayerCheck(Healthblocks check, int x)
+    {
+        float temphp;
+        float tempnumber;
+
+        tempnumber = check.segments.Count();
+        tempnumber = tempnumber - 1;
+        tempnumber = (tempnumber * 2) * 10;
+        if(x == 1)
+        {
+            if (tempnumber != Fighter1HP)
+            {
+                if(tempnumber > Fighter1HP)
+                {
+                    Fighter1HP = tempnumber;
+                    Fighter1Priority += 2;
+                }
+            }
+        }
+
+       else if (x == 2)
+        {
+            if (tempnumber != Fighter2HP)
+            {
+                if (tempnumber > Fighter2HP)
+                {
+                    Fighter2HP = tempnumber;
+                    Fighter2Priority += 2;
+                }
+            }
+        }
+
+       else if (x == 3)
+        {
+            if (tempnumber != Fighter3HP)
+            {
+                if (tempnumber > Fighter3HP)
+                {
+                    Fighter3HP = tempnumber;
+                    Fighter3Priority += 2;
+                }
+            }
+        }
+
+       else if (x == 4)
+        {
+            if (tempnumber != Fighter4HP)
+            {
+                if (tempnumber > Fighter4HP)
+                {
+                    Fighter4HP = tempnumber;
+                    Fighter4Priority += 2;
+                }
+            }
+        }
+
+
+    }
 
     public void AICheck(HardAI check, int x)
     {
@@ -259,7 +357,22 @@ public class DirectorAI : MonoBehaviour
         {
             try
             {
-                returnobject = GameObject.Find("Player" + x);
+                if (x == 1)
+                {
+                  FighterHealthblocks1 = returnobject.GetComponent<Healthblocks>();
+                }
+                else if (x == 2)
+                {
+                    FighterHealthblocks1 = returnobject.GetComponent<Healthblocks>();
+                }
+                else if (x == 3)
+                {
+                    FighterHealthblocks1 = returnobject.GetComponent<Healthblocks>();
+                }
+                else if (x == 4)
+                {
+                    FighterHealthblocks1 = returnobject.GetComponent<Healthblocks>();
+                }
             }
             catch
             {
