@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -338,11 +338,11 @@ public class MediumAI : MonoBehaviour
         }
         if (gametimer >= 40 && gametimer < 120)
         {
-            randomint = Random.Range(0, 6);
+            randomint = Random.Range(1, 6);
         }
         if (gametimer >= 120 && gametimer < 240)
         {
-            randomint = Random.Range(0, 10);
+            randomint = Random.Range(4, 10);
         }
 
         if (randomint < 5)
@@ -380,32 +380,53 @@ public class MediumAI : MonoBehaviour
 
     public void Move()
     {
-        print("Tableflip");
-        if (Distance > enemy_AI.stoppingDistance)   //If the target is at least a certain distance away, move towards it
+        if(Target.tag == "Powerup")
         {
-            if (Distance > 2 * enemy_AI.stoppingDistance)
+            if(Distance > 1)
             {
-                enemy_AI.speed = 2; //If the enemy is far away then move faster
+                enemy_AI.isStopped = false;    //Sets the navmesh bool 
+                                               //this.gameObject.transform.LookAt(Target.transform);
+                enemy_AI.SetDestination(Target.position);
+            }
+
+            else
+            {
+                Destroy(Target.gameObject);
+                print("destroyed through move");
+                enemy_AI.isStopped = true; //If the target is within a certain distance to the AI Unit then the navmesh agent should stop moving
+                CurrentState = States.Search;
+            }
+        }
+        else
+        {
+            if (Distance > enemy_AI.stoppingDistance)   //If the target is at least a certain distance away, move towards it
+            {
+                if (Distance > 2 * enemy_AI.stoppingDistance)
+                {
+                    enemy_AI.speed = 2; //If the enemy is far away then move faster
+                }
+                else
+                {
+                    enemy_AI.speed = 1; //If the enemy is close then move slower
+                }
+
+                enemy_AI.isStopped = false;    //Sets the navmesh bool 
+                                               //this.gameObject.transform.LookAt(Target.transform);
+                enemy_AI.SetDestination(Target.position); //Sets the navmesh destination
             }
             else
             {
-                enemy_AI.speed = 1; //If the enemy is close then move slower
+                enemy_AI.isStopped = true; //If the target is within a certain distance to the AI Unit then the navmesh agent should stop moving
+                CurrentState = States.Hit; //Once in range switch into the hit state
             }
-
-            enemy_AI.isStopped = false;    //Sets the navmesh bool 
-            //this.gameObject.transform.LookAt(Target.transform);
-            enemy_AI.SetDestination(Target.position); //Sets the navmesh destination
         }
+        
 
         //if (Distance < 2)
         // {
         //    CurrentState = States.Hit;
         //}
-        else
-        {
-            enemy_AI.isStopped = true; //If the target is within a certain distance to the AI Unit then the navmesh agent should stop moving
-            CurrentState = States.Hit; //Once in range switch into the hit state
-        }
+        
     }
 
     public void Hit(int rand)
@@ -745,9 +766,9 @@ public class MediumAI : MonoBehaviour
         GameObject[] PowerupGo;
 
         PowerupGo = GameObject.FindGameObjectsWithTag("Powerup");
-        if(PowerupGo[1] != null)
+        if(PowerupGo[0] != null)
         {
-            return PowerupGo[1];
+            return PowerupGo[0];
         }
         else
         {
@@ -819,21 +840,26 @@ public class MediumAI : MonoBehaviour
 
 
 
-    /* public void OnTriggerEnter(Collider other)
-     {
-         if(other.gameObject.tag == "SpeedPowerup")
+    public void  OnCollisionEnter(Collision collision)
+    {
+         if(collision.gameObject.name == "SpeedPowerup")
          {
-             HPUIScript.SpeedPickup();
-             HPUIScript.pwrups.SpawnAfterPickup();
-         }
-         else if(other.gameObject.tag == "HealthPickup")
+            Destroy(collision.gameObject);
+            print(this.name + "Pickupspeed");
+            //HPUIScript.SpeedPickup();
+            //HPUIScript.pwrups.SpawnAfterPickup();
+        }
+         else if(collision.gameObject.name == "HealthPickup")
          {
-             HPUIScript.HealthPickup();
+             //HPUIScript.HealthPickup();
              Health = Health + 10;
-             HPUIScript.pwrups.SpawnAfterPickup();
+            Destroy(collision.gameObject);
+            print("Pickup");
+            print(this.name + "Pickuphealth");
+             //HPUIScript.pwrups.SpawnAfterPickup();
          }
      }
-     */
+     
 
 
 }
