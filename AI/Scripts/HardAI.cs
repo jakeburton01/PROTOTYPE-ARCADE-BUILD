@@ -417,31 +417,46 @@ public class HardAI : MonoBehaviour
 
     public void Move()
     {
-        print("Tableflip");
-        if (Distance > enemy_AI.stoppingDistance)   //If the target is at least a certain distance away, move towards it
+
+        if (Target.tag == "Powerup")
         {
-            if (Distance > 2 * enemy_AI.stoppingDistance)
+            if (Distance > 1)
             {
-                enemy_AI.speed = 2; //If the enemy is far away then move faster
+                enemy_AI.isStopped = false;    //Sets the navmesh bool 
+                                               //this.gameObject.transform.LookAt(Target.transform);
+                enemy_AI.SetDestination(Target.position);
+            }
+
+            else
+            {
+                Destroy(Target.gameObject);
+                print("destroyed " + Target.gameObject.name+ " through move");
+                enemy_AI.isStopped = true; //If the target is within a certain distance to the AI Unit then the navmesh agent should stop moving
+                CurrentState = States.Search;
+            }
+        }
+        else
+        {
+            if (Distance > enemy_AI.stoppingDistance)   //If the target is at least a certain distance away, move towards it
+            {
+                if (Distance > 2 * enemy_AI.stoppingDistance)
+                {
+                    enemy_AI.speed = 2; //If the enemy is far away then move faster
+                }
+                else
+                {
+                    enemy_AI.speed = 1; //If the enemy is close then move slower
+                }
+
+                enemy_AI.isStopped = false;    //Sets the navmesh bool 
+                                               //this.gameObject.transform.LookAt(Target.transform);
+                enemy_AI.SetDestination(Target.position); //Sets the navmesh destination
             }
             else
             {
-                enemy_AI.speed = 1; //If the enemy is close then move slower
+                enemy_AI.isStopped = true; //If the target is within a certain distance to the AI Unit then the navmesh agent should stop moving
+                CurrentState = States.Hit; //Once in range switch into the hit state
             }
-
-            enemy_AI.isStopped = false;    //Sets the navmesh bool 
-            //this.gameObject.transform.LookAt(Target.transform);
-            enemy_AI.SetDestination(Target.position); //Sets the navmesh destination
-        }
-
-        //if (Distance < 2)
-        // {
-        //    CurrentState = States.Hit;
-        //}
-        else
-        {
-            enemy_AI.isStopped = true; //If the target is within a certain distance to the AI Unit then the navmesh agent should stop moving
-            CurrentState = States.Hit; //Once in range switch into the hit state
         }
     }
 
