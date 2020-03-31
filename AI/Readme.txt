@@ -2,6 +2,7 @@ Director AI must be attached to "GameManager" game object in the scene. This att
 
 
 ###Current powerup pathfinding requires objects to be tagged with "Powerup", the spawning script spawns them with different tags vs just using different object names###
+AI now properly search for and destroy powerups that are tagged as powerup. (When instantiating a powerup it automatically is named with (clone) affixed, need to in code specify names)
 
 
 
