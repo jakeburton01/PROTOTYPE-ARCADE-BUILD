@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using System.Threading;
 using System.Linq;
 using UnityEngine.AI;
 
@@ -75,9 +76,16 @@ public class HardAI : MonoBehaviour
 
     public DirectorAI Director;
 
+    //Thread SearchThread = new Thread(SearchforPowerup);
+   // private Thread SearchThread;
+    public float testfloat;
+    public GameObject testthreadobject;
+
     // Start is called before the first frame update
     void Start()
     {
+        
+        
         Director = GameObject.Find("GameManager").GetComponent<DirectorAI>();
         gametimer = 0;
         enemy_AI = GetComponent<NavMeshAgent>();
@@ -98,6 +106,11 @@ public class HardAI : MonoBehaviour
 
         HitsGiven = 0;
         HitsTaken = 0;
+
+        testfloat = 0;
+        //SearchThread = new Thread(SearchforPowerup);
+
+        //SearchThread.Start();
         /* if (AINumber == 1) //AI number defined in inspector, but will be defined through instantiation later.
          {
              HPUIReference = GameObject.Find("AI1Hold");
@@ -123,8 +136,9 @@ public class HardAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        InvokeRepeating("BreakForPowerups", 0, 5);
+        
+        //SearchforPowerup();
+       
 
         gametimer += Time.deltaTime;
         if (enemy_AI.enabled == false)
@@ -240,10 +254,35 @@ public class HardAI : MonoBehaviour
     }
 
 
+   /* private  void SearchforPowerup()
+    {
+        bool live;
+        live = SearchThread.IsAlive;
+        while (live)
+        {
+
+            try
+            {
+                testthreadobject = GameObject.FindGameObjectWithTag("Powerup");
+            }
+            catch
+            {
+                testfloat = testfloat + 1;
+            }
+            
+        }
+        
+        
+    }*/
+
+
+
+
     public void IdleWander()
     {
         enemy_AI.isStopped = false;
-
+        bool breakoutofwander;
+        breakoutofwander = false;
         RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
         if (AINumber == 1)
         {
@@ -298,41 +337,58 @@ public class HardAI : MonoBehaviour
                 IdleWander();
             }
         }
-        if (timer <= wanderTimer && wayPointGO != null)
+        while(breakoutofwander == false && testthreadobject == null)
         {
-            print("Setting Path");
-            enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
-            NavMeshPath path = new NavMeshPath(); //Creates a temporary path in memory that can be queried
-                                                  //print("Path Found");
-            enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
-            if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
+            if (timer <= wanderTimer && wayPointGO != null)
             {
+                print("Setting Path");
+                enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
+                NavMeshPath path = new NavMeshPath(); //Creates a temporary path in memory that can be queried
+                                                      //print("Path Found");
+                enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
+                if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
+                {
 
-                Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
-                                    //print("invalid path");
-                wayPoint = false;//States that no waypoint is active so another is to be spawned    [Inside RandomNavSphereWaypoint function]
+                    Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
+                                        //print("invalid path");
+                    wayPoint = false;//States that no waypoint is active so another is to be spawned    [Inside RandomNavSphereWaypoint function]
+                }
+                else if (wayDistance <= enemy_AI.stoppingDistance)
+                {
+                    Destroy(wayPointGO);
+                    // print("Path concluded");
+                    wayPoint = false;  //If the AI unit reaches the waypoint, destroy it and create another
+                }
+                //Vector3 newPos = RandomNavSphere(this.transform.position, wanderRadius, -1);
+
+                //enemy_AI.SetDestination();
+
             }
-            else if (wayDistance <= enemy_AI.stoppingDistance)
+
+            if (timer >= wanderTimer)
             {
-                Destroy(wayPointGO);
-                // print("Path concluded");
-                wayPoint = false;  //If the AI unit reaches the waypoint, destroy it and create another
+                if (CurrentState == States.Idle)
+                {
+                    print("Needs to get here");
+                    Search();
+                    CurrentState = States.Search;//Once the timer reaches its max allowed value, move into search
+                    break;
+                }
             }
-            //Vector3 newPos = RandomNavSphere(this.transform.position, wanderRadius, -1);
 
-            //enemy_AI.SetDestination();
+            try
+            {
+                testthreadobject = GameObject.FindGameObjectWithTag("Powerup");
+                BreakForPowerup();
+            }
+            catch
+            {
+                print("NoFind");
+            }
+            break;
 
         }
-
-        if (timer >= wanderTimer)
-        {
-            if (CurrentState == States.Idle)
-            {
-                print("Needs to get here");
-                Search();
-                CurrentState = States.Search;//Once the timer reaches its max allowed value, move into search
-            }
-        }
+        
 
     }
 
@@ -417,6 +473,9 @@ public class HardAI : MonoBehaviour
 
     public void Move()
     {
+        bool breakout;
+        breakout = false;
+
 
         if (Target.tag == "Powerup")
         {
@@ -437,26 +496,45 @@ public class HardAI : MonoBehaviour
         }
         else
         {
-            if (Distance > enemy_AI.stoppingDistance)   //If the target is at least a certain distance away, move towards it
+            while(testthreadobject == null && breakout == false)
             {
-                if (Distance > 2 * enemy_AI.stoppingDistance)
+                if (Distance > enemy_AI.stoppingDistance)   //If the target is at least a certain distance away, move towards it
                 {
-                    enemy_AI.speed = 2; //If the enemy is far away then move faster
+                    if (Distance > 2 * enemy_AI.stoppingDistance)
+                    {
+                        enemy_AI.speed = 2; //If the enemy is far away then move faster
+                    }
+                    else
+                    {
+                        enemy_AI.speed = 1; //If the enemy is close then move slower
+                    }
+
+                    enemy_AI.isStopped = false;    //Sets the navmesh bool 
+                                                   //this.gameObject.transform.LookAt(Target.transform);
+                    enemy_AI.SetDestination(Target.position); //Sets the navmesh destination
                 }
                 else
                 {
-                    enemy_AI.speed = 1; //If the enemy is close then move slower
+                    enemy_AI.isStopped = true; //If the target is within a certain distance to the AI Unit then the navmesh agent should stop moving
+                    
+                    CurrentState = States.Hit; //Once in range switch into the hit state
+                    breakout = true;
+                    break;
                 }
 
-                enemy_AI.isStopped = false;    //Sets the navmesh bool 
-                                               //this.gameObject.transform.LookAt(Target.transform);
-                enemy_AI.SetDestination(Target.position); //Sets the navmesh destination
+
+                try
+                {
+                    testthreadobject = GameObject.FindGameObjectWithTag("Powerup");
+                    BreakForPowerup();
+                }
+                catch
+                {
+                    print("NoFind");
+                }
+                break;
             }
-            else
-            {
-                enemy_AI.isStopped = true; //If the target is within a certain distance to the AI Unit then the navmesh agent should stop moving
-                CurrentState = States.Hit; //Once in range switch into the hit state
-            }
+            
         }
     }
 
@@ -910,6 +988,7 @@ public class HardAI : MonoBehaviour
     public void BreakForPowerup()
     {
         GameObject returnPowerup;
+        testthreadobject = null;
         try
         {
             returnPowerup = GameObject.FindGameObjectWithTag("Powerup");
