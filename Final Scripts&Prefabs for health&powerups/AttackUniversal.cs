@@ -71,16 +71,16 @@ public class AttackUniversal : MonoBehaviour
                     Is_Collided = true;
                     print("ObjectIsHit");
 
-                  //  if (gameObject.GetComponentInParent<Healthblocks>().damagePowerup == true)
-                  //  {
-                   //     hit[0].GetComponent<Healthblocks>().TakeDoubleDamage();
-                  //      gameObject.GetComponentInParent<Healthblocks>().damagePowerup = false;
-                   // }
-                   // else
-                    //{
+                    if (gameObject.GetComponentInParent<Healthblocks>().damagePowerup == true)
+                    {
+                        hit[0].GetComponent<Healthblocks>().TakeDoubleDamage();
+                        gameObject.GetComponentInParent<Healthblocks>().damagePowerup = false;
+                    }
+                    else
+                    {
                         hit[0].GetComponent<Healthblocks>().NormalDamage();
                         //hit[0].gameObject.GetComponent<CharacterAnimation>().BeenHit();
-                   // }
+                    }
                 }
 
 
@@ -89,15 +89,16 @@ public class AttackUniversal : MonoBehaviour
                 if (gameObject.CompareTag(Tags.STRONG_PUNCH_TAG))
                 {
 
-                   // if (gameObject.GetComponentInParent<Healthblocks>().damagePowerup == true)
-                   // {
-                   //     hit[0].GetComponent<Healthblocks>().TakeDoubleDamage();
-                    //    gameObject.GetComponentInParent<Healthblocks>().damagePowerup = false;
-                   //     
-                    //} else
-                    //{
+                    if (gameObject.GetComponentInParent<Healthblocks>().damagePowerup == true)
+                    {
+                        hit[0].GetComponent<Healthblocks>().TakeDoubleDamage();
+                        gameObject.GetComponentInParent<Healthblocks>().damagePowerup = false;
+
+                    }
+                    else
+                    {
                         hit[0].GetComponent<Healthblocks>().NormalDamage();
-                   // }
+                    }
 
                 }
 
