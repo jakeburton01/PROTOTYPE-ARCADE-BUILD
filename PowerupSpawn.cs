@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class PowerupSpawn : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public GameObject HealthPowerup;
-    public GameObject DamagePowerup;
-    public GameObject SpeedPowerup;
+    
     public GameObject[] Powerups;
     public Transform[] spawnPoints;
     int spawnPointsIndex;
     int powerupsIndex;
 
+    // Start is called before the first frame update
     void Start()
     {
 
@@ -35,11 +33,13 @@ public class PowerupSpawn : MonoBehaviour
 
     public void StartSpawning()
     {
-        InvokeRepeating("SpawnPowerups", 0, Random.Range(20,30));
+        InvokeRepeating("SpawnPowerups", 0, Random.Range(10,20));
     }
 
     public void SpawnAfterPickup()
     {
         Invoke("SpawnPowerups", Random.Range(5, 10));
     }
+
+    
 }

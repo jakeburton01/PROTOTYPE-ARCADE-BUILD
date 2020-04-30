@@ -11,10 +11,11 @@ public class Healthblocks : MonoBehaviour
     public bool blockFlashing;
     public bool neutral;
     public bool speedPowerup;
-    public bool hitByDamagePowerup;
+    public bool damagePowerup;
     public float regenTimer;
     int i;
     public float chargedTimer;
+    public float originalMovementSpeed;
     public Vector3[] positions;
     float originalSpeed;
     public float powerupNewSpeed;
@@ -25,12 +26,11 @@ public class Healthblocks : MonoBehaviour
     //damage powerup boolean turns true the player is given an increased damage punch which can only be used once and will have to be the next attack 
     public bool dizzyIsPlaying;
     public bool dizzyState = false;
-    public float idleTimer = 5f;
+    public float idleTimer = 8f;
     private CharacterAnimation _anim;
     private JoystickMovement _movement;
-    public GameObject manager;
-    PowerupSpawn pwrups;
-
+    Healthblocks enemyPlayer;
+    
 
     void Start()
     {
@@ -47,10 +47,9 @@ public class Healthblocks : MonoBehaviour
         positions[5] = segments[5].transform.position;
         segments.RemoveAt(i);
         FlashingBlock = segments[4];
-        hitByDamagePowerup = false;
         speedPowerup = false;
+        damagePowerup = false;
         _movement = GetComponent<JoystickMovement>();
-        pwrups = manager.GetComponent<PowerupSpawn>();
     }
 
     void Awake()
@@ -66,10 +65,14 @@ public class Healthblocks : MonoBehaviour
 
     void Update()
     {
-        Knockout();
+        //Knockout();
         i = segments.Count - 1;
         regenTimer += Time.deltaTime;
-        //print(FlashingBlock);
+
+        if (speedPowerup == false)
+        {
+            _movement.movementSpeed = 2f;
+        }
 
         if (blockFlashing)
         {
@@ -79,8 +82,8 @@ public class Healthblocks : MonoBehaviour
         //if healthbar is empty then bring up game over text 
         if (segments.Count == 0)
         {
-            //GameOver();
             dizzyState = true;
+            Knockout();
         }
 
         if (regenTimer >= 11f)
@@ -94,7 +97,7 @@ public class Healthblocks : MonoBehaviour
             HealthRegen();
         }
 
-
+        /*
         //ignore from HERE 
         if (Input.GetKeyDown("h"))
         {
@@ -124,6 +127,7 @@ public class Healthblocks : MonoBehaviour
             DamagePickup();
         }
         //to HERE just here for testing purposes
+        */
     }
 
 
@@ -145,12 +149,6 @@ public class Healthblocks : MonoBehaviour
             yield return null;
         }
         yield return FlashingBlock.color = defaultColor;
-    }
-
-    //brings up game over text
-    public void GameOver()
-    {
-
     }
 
 
@@ -300,7 +298,7 @@ public class Healthblocks : MonoBehaviour
     // coroutine to determine the length the speed powerup lasts for 
     IEnumerator PowerUpTimer()
     {
-        //current speed of player variable = powerupNewSpeed
+        _movement.movementSpeed = 4f;        
         yield return new WaitForSeconds(powerupLength);
         StopCoroutine(PowerUpTimer());
 
@@ -311,7 +309,7 @@ public class Healthblocks : MonoBehaviour
     // function called when the player picks up the speed powerup 
     void SpeedPickup()
     {
-        //originalSpeed = current speed of player variable
+        originalMovementSpeed = _movement.movementSpeed;
         speedPowerup = true;
         StartCoroutine(PowerUpTimer());
     }
@@ -319,7 +317,7 @@ public class Healthblocks : MonoBehaviour
     // function called when the player picks up the damage powerup 
     void DamagePickup()
     {
-        hitByDamagePowerup = true;
+        damagePowerup = true;
     }
 
     // function called when the player picks up the health powerup 
@@ -464,6 +462,13 @@ public class Healthblocks : MonoBehaviour
             dizzyIsPlaying = false;
             dizzyState = false;
             _anim.Idle(true);
+            var Health = (RawImage)Instantiate(healthPrefab) as RawImage;
+            Health.transform.SetParent(transform, false);
+            Health.enabled = true;
+            segments.Add(Health);
+            i = segments.Count - 1;
+            FlashingBlock = segments[i];
+            Health.transform.position = positions[0];
         }
 
 
@@ -486,7 +491,7 @@ public class Healthblocks : MonoBehaviour
             SelectedBlock2.enabled = false; ;
             chargedTimer = 0f;
             neutral = true;
-            hitByDamagePowerup = false;
+            
 
         }
         else
@@ -503,7 +508,7 @@ public class Healthblocks : MonoBehaviour
             chargedTimer = 0f;
             regenTimer = 0f;
             neutral = false;
-            hitByDamagePowerup = false;
+            
         }
 
     }
@@ -514,15 +519,31 @@ public class Healthblocks : MonoBehaviour
         if (collider.gameObject.tag == "SpeedPowerup")
         {
             SpeedPickup();
-            pwrups.SpawnAfterPickup();
-
         }
 
         //calls the health pickup function when the player picks up the health powerup
         if (collider.gameObject.tag == "HealthPowerup")
         {
             HealthPickup();
-            pwrups.SpawnAfterPickup();
+        }
+
+        if(collider.gameObject.tag == "DamagePowerup")
+        {
+            DamagePickup();
+        }
+
+
+        if(collider.gameObject.tag == "Player")
+        {
+            enemyPlayer = collider.gameObject.GetComponent<Healthblocks>();
+            if(enemyPlayer.damagePowerup == true)
+            {
+                TakeDoubleDamage();
+                enemyPlayer.damagePowerup = false;
+            } else
+            {
+                NormalDamage();
+            }
         }
 
     }
