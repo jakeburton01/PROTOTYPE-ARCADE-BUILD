@@ -1,3 +1,18 @@
+~~~02/05/2020
+
+Working on player/AI intergration, small amounts of non-AI code will be changed (Will log each change). 
+Currently no FX on hit, only left punch implemented 
+
+Will provide either a full project file or prefabs when complete
+
+
+
+
+
+
+
+
+
 Director AI must be attached to "GameManager" game object in the scene. This attempts to watch the state of each fighter and find a high threat/priority target for the AI to attack. Currently half implemented for finding players.
 
 
