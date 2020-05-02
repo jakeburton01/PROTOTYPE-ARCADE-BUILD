@@ -205,7 +205,9 @@ public class EasyAI : MonoBehaviour
                 case States.Hit:
                     {
                         hitCooldownTimer -= Time.deltaTime;
-                        Hit();
+                        float rand;
+                        rand = Random.Range(0, 4);
+                        Hit(rand);
                         break;
                     }
 
@@ -224,6 +226,7 @@ public class EasyAI : MonoBehaviour
 
     public void IdleWander()
     {
+        print("In idle wander");
         enemy_AI.isStopped = false;
         
         RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
@@ -368,45 +371,54 @@ public class EasyAI : MonoBehaviour
         }
     }
 
-    public void Hit()
+    public void Hit(float rand)
     {
         Rigidbody hitRB = TargetObj.GetComponent<Rigidbody>();  //Finds the rigid body attatched to the target, used for knockback
 
         if (hasHit == false) //If the AI hasn't hit recently
         {
-
-            this.gameObject.transform.LookAt(hitRB.transform);
-            hitRandom = Random.Range(0, 20); //Creates a random number between 0 and 20
-            if (TargetObj.tag == "Enemy") //Checks whether its an AI or Player fighter
+            if(rand == 1)
             {
-                EasyAI hitTarget = TargetObj.GetComponent<EasyAI>();
-                Healthblocks hitHPBarScript = TargetObj.GetComponent<Healthblocks>();
-                if (hitRandom >= 0 && hitRandom <= 21) //If the random number is between 0 and 10, do a normal attack
+                this.gameObject.transform.LookAt(hitRB.transform);
+                hitRandom = Random.Range(0, 20); //Creates a random number between 0 and 20
+                if (TargetObj.tag == "Enemy") //Checks whether its an AI or Player fighter
                 {
-                    
-                    player_Anim.Right_Punch(); //Plays a punch animation
-                    hitHPBarScript.NormalDamage(); //Calls the damage script in the enemy's hp script       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CURRENTLY REFERENCING ITS OWN SCRIPT!!!!!!!!!!!!!!!!!!!!!!!!
-                    //moveDirection = TargetObj.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
-                    //hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
-                    hitTarget.previousHealth = Health;
-                    hitTarget.Health -= 10;  //Current target health is reduced by 10 on a normal hit
-                    hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
-                    hitTarget.HPBarSet = true;
-                    hitTarget.HPBarHitValue = 10; //Depreciated
-                    //hitTarget.enemy_AI.enabled = false;
+                    EasyAI hitTarget = TargetObj.GetComponent<EasyAI>();
+                    Healthblocks hitHPBarScript = TargetObj.GetComponent<Healthblocks>();
+                    if (hitRandom >= 0 && hitRandom <= 21) //If the random number is between 0 and 10, do a normal attack
+                    {
+
+                        player_Anim.Right_Punch(); //Plays a punch animation
+                        hitHPBarScript.NormalDamage(); //Calls the damage script in the enemy's hp script       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CURRENTLY REFERENCING ITS OWN SCRIPT!!!!!!!!!!!!!!!!!!!!!!!!
+                                                       //moveDirection = TargetObj.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
+                                                       //hitRB.AddForce(moveDirection.normalized * +4000f); //Adds a force to the target rigid body, using the above defined direction
+                        hitTarget.previousHealth = Health;
+                        hitTarget.Health -= 10;  //Current target health is reduced by 10 on a normal hit
+                        hasHit = true; //This AI is now considered to have hit and will have to wait for the hit cooldown
+                        hitTarget.HPBarSet = true;
+                        hitTarget.HPBarHitValue = 10; //Depreciated
+                                                      //hitTarget.enemy_AI.enabled = false;
+
+                    }
+
 
                 }
 
-
+                if (TargetObj.tag == "Player")
+                {
+                    Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
+                    player_Anim.Right_Punch();
+                    hitHPScript.NormalDamage();
+                }
             }
 
-            if (TargetObj.tag == "Player")
+            else if(rand != 1)
             {
-                Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
                 player_Anim.Right_Punch();
-                hitHPScript.NormalDamage();
                 hasHit = true;
             }
+
+            
 
         }
 
@@ -417,7 +429,7 @@ public class EasyAI : MonoBehaviour
             CurrentState = States.Idle;
             IdleWander();
             timer = 0; //If hasHit is true then switch back into the idle state
-            
+            hasHit = true;
         }
     }
 
@@ -596,8 +608,19 @@ public class EasyAI : MonoBehaviour
         GameObject[] AIGo;
         GameObject[] PlayerGO;
         GameObject[] gos;//Creates an empty array for game objects to be placed into 
-        AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
-        PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        
+            AIGo = GameObject.FindGameObjectsWithTag("Enemy");
+        
+        //Fills the array with gameobjects that are tagged as "Enemy"
+        try
+        {
+            PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        }
+        catch
+        {
+            PlayerGO = null;
+        }
+        
         gos = AIGo.Concat(PlayerGO).ToArray(); //Joins two GameObject arrays to one single array
         GameObject closest = null; //Initialises the return game object
         float distance = Mathf.Infinity; //Initialises a temporary float to measure distance
@@ -651,7 +674,9 @@ public class EasyAI : MonoBehaviour
     }
 
 
-/*public void OnTriggerEnter(Collider other)
+
+
+   /* public void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.tag == "SpeedPowerup")
         {
@@ -664,7 +689,8 @@ public class EasyAI : MonoBehaviour
             Health = Health + 10;
             HPUIScript.pwrups.SpawnAfterPickup();
         }
-    }*/
+    }
+    */
 
 
 }
