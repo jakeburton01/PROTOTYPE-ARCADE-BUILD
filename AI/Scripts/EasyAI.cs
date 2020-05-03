@@ -114,6 +114,11 @@ public class EasyAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+    if(Health <=0)
+        {
+            Destroy(this.gameObject);
+        }
+    
         if (enemy_AI.enabled == false)
         {
 
