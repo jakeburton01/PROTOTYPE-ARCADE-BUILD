@@ -24,9 +24,9 @@ Ontrigger enter function holding the collission effects
 Known Issues:
 AI and player can walk through eachother
 animations seem very fast
-AI can get stuck inside player when it goes for a hit but is within runaway hp threshold. (if under 20 hp it can break into a hit command if its too close and then not break out)
-Model doesn't get destroyed when dropped to 0hp (should be easy fix)
-Navmesh floats above the arena floor due to bottom of navmesh not being bottom of model
+AI can get stuck inside player when it goes for a hit but is within runaway hp threshold. (if under 20 hp it can break into a hit command if its too close and then not break out)       
+Model doesn't get destroyed when dropped to 0hp (should be easy fix)      //FIXED
+Navmesh floats above the arena floor due to bottom of navmesh not being bottom of model     //Will depend on each map/project file
 
 
 Will provide either a full project file or prefabs when complete
