@@ -8,7 +8,8 @@ using UnityEngine.AI;
 
 public class HardAI : MonoBehaviour
 {
-
+    public GameObject hit_FX;
+    float tempnumber;
     Transform Target;   //Used in search algorithm to find position of target
 
     GameObject TargetObj;  //Finds the game object of the target
@@ -897,7 +898,14 @@ public class HardAI : MonoBehaviour
         GameObject[] PlayerGO;
         GameObject[] gos;//Creates an empty array for game objects to be placed into 
         AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
-        PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        try
+        {
+            PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        }
+        catch
+        {
+            PlayerGO = null;
+        }
         gos = AIGo.Concat(PlayerGO).ToArray(); //Joins two GameObject arrays to one single array
         GameObject closest = null; //Initialises the return game object
         float distance = Mathf.Infinity; //Initialises a temporary float to measure distance
@@ -927,7 +935,14 @@ public class HardAI : MonoBehaviour
         GameObject[] PlayerGO;
 
         AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
-        PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        try
+        {
+            PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        }
+        catch
+        {
+            PlayerGO = null;
+        }
 
         re = AIGo.Concat(PlayerGO).ToArray();//Joins two GameObject arrays to one single array
         GameObject randomEnemy = null; //Initialises an empty game object variable
@@ -958,14 +973,24 @@ public class HardAI : MonoBehaviour
         try
         {
             returnobject = GameObject.Find("AI" + x);
+            return returnobject;
         }
         catch
         {
+            
+        }
+        try
+        {
             returnobject = GameObject.Find("Player" + x);
+            return returnobject;
+        }
+        catch
+        {
+            return null;
         }
         
 
-        return returnobject;
+        
     }
 
 
