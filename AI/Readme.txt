@@ -2,6 +2,8 @@
 
 ######Current implementation requires a box collider, OnTrigger, to be attached to Left Hand Attack Point/Right Arm Attack Point/Strong Arm Attack Point#####
 
+Static Navmesh will need to be created, I have just used an invisible plane to do so.
+
 
 Working on player/AI intergration, small amounts of non-AI code will be changed (Will log each change). 
 only left punch implemented 
