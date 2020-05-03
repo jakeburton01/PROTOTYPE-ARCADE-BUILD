@@ -7,7 +7,8 @@ using UnityEngine.AI;
 
 public class MediumAI : MonoBehaviour
 {
-
+    public GameObject hit_FX;
+    float tempnumber;
     Transform Target;   //Used in search algorithm to find position of target
 
     GameObject TargetObj;  //Finds the game object of the target
@@ -115,6 +116,10 @@ public class MediumAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Health <= 0)
+        {
+            Destroy(this.gameObject);
+        }
 
         gametimer += Time.deltaTime;
         if (enemy_AI.enabled == false)
@@ -434,6 +439,8 @@ public class MediumAI : MonoBehaviour
         try
         {
             Rigidbody hitRB = TargetObj.GetComponent<Rigidbody>();  //Finds the rigid body attatched to the target, used for knockback
+            Vector3 hitFX_Pos = TargetObj.transform.position;
+            hitFX_Pos.y = 1.3f;
             if (hasHit == false) //If the AI hasn't hit recently
             {
                 if (rand == 0)
@@ -446,7 +453,7 @@ public class MediumAI : MonoBehaviour
                         Healthblocks hitHPBarScript = TargetObj.GetComponent<Healthblocks>();
                         if (hitRandom >= 0 && hitRandom <= 21) //If the random number is between 0 and 10, do a normal attack
                         {
-
+                            Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
                             player_Anim.Right_Punch(); //Plays a punch animation
                             hitHPBarScript.NormalDamage(); //Calls the damage script in the enemy's hp script       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CURRENTLY REFERENCING ITS OWN SCRIPT!!!!!!!!!!!!!!!!!!!!!!!!
                                                            //moveDirection = TargetObj.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
@@ -465,6 +472,7 @@ public class MediumAI : MonoBehaviour
 
                     if (TargetObj.tag == "Player")
                     {
+                        Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
                         Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
                         player_Anim.Right_Punch();
                         hitHPScript.NormalDamage();
@@ -482,7 +490,7 @@ public class MediumAI : MonoBehaviour
                         Healthblocks hitHPBarScript = TargetObj.GetComponent<Healthblocks>();
                         if (hitRandom >= 0 && hitRandom <= 21) //If the random number is between 0 and 10, do a normal attack
                         {
-
+                            Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
                             player_Anim.Left_Punch(); //Plays a punch animation
                             hitHPBarScript.NormalDamage(); //Calls the damage script in the enemy's hp script       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!CURRENTLY REFERENCING ITS OWN SCRIPT!!!!!!!!!!!!!!!!!!!!!!!!
                                                            //moveDirection = TargetObj.transform.position - this.transform.position; //Direction away from the attacker, backwards for the target
@@ -501,6 +509,7 @@ public class MediumAI : MonoBehaviour
 
                     if (TargetObj.tag == "Player")
                     {
+                        Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
                         Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
                         player_Anim.Left_Punch();
                         hitHPScript.NormalDamage();
@@ -518,6 +527,7 @@ public class MediumAI : MonoBehaviour
                         Healthblocks hitHPBarScript = TargetObj.GetComponent<Healthblocks>();
                         if (hitRandom >= 0 && hitRandom <= 21) //If the random number is between 0 and 10, do a normal attack
                         {
+                            Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
                             print("strong hit");
                             player_Anim.Strong_Punch(); //Plays a punch animation
                             hitHPBarScript.chargedTimer = 3;
@@ -538,6 +548,7 @@ public class MediumAI : MonoBehaviour
 
                     if (TargetObj.tag == "Player")
                     {
+                        Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
                         Healthblocks hitHPScript = TargetObj.GetComponent<Healthblocks>();
                         player_Anim.Strong_Punch();
                         hitHPScript.NormalDamage();
@@ -592,115 +603,243 @@ public class MediumAI : MonoBehaviour
     {
         Target = FindClosestEnemy().transform;
         TargetObj = FindClosestEnemy(); //Finds the closest tagged enemy unit
-        MediumAI hitTarget = TargetObj.GetComponent<MediumAI>();
-        if (Target != null) //If an enemy is found in the scene then continue
+        if (TargetObj.tag == "Enemy")
         {
-            if (hitTarget.Health <= Health)
+            EasyAI hitTarget = TargetObj.GetComponent<EasyAI>();
+
+            if (Target != null) //If an enemy is found in the scene then continue
             {
-                CurrentState = States.Move;
-                print("Chasing");
-            }
 
-            if (hitTarget.Health > Health)
-            {
-                print("Running");
-                RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
-
-
-                //print("Waypointed");
-                if (AINumber == 1)
+                if (hitTarget.Health <= Health)
                 {
-                    try
-                    {
-                        wayPointGO = GameObject.Find("Waypoint_AI1");
-                        // print("Found run way");
-                        //print(wayPointGO.name);
-                    }
-                    catch
-                    {
-                        print("NO RUN WAYPOINT FOUND");
-                    }
-                }
-                else if (AINumber == 2)
-                {
-                    try
-                    {
-                        wayPointGO = GameObject.Find("Waypoint_AI2");
-                    }
-                    catch
-                    {
-                        print("NO WAYPOINT FOUND");
-                    }
-                }
-                else if (AINumber == 3)
-                {
-                    try
-                    {
-                        wayPointGO = GameObject.Find("Waypoint_AI3");
-                    }
-                    catch
-                    {
-                        print("NO WAYPOINT FOUND");
-                    }
-                }
-                else if (AINumber == 4)
-                {
-                    try
-                    {
-                        wayPointGO = GameObject.Find("Waypoint_AI4");
-                    }
-                    catch
-                    {
-                        print("NO WAYPOINT FOUND");
-                    }
+                    CurrentState = States.Move;
+                    print("Chasing");
                 }
 
-
-                if (wayPointGO != null)
+                if (hitTarget.Health > Health)
                 {
-                    Waypointer way = wayPointGO.GetComponent<Waypointer>();
-                    BoxCollider waybox = wayPointGO.GetComponent<BoxCollider>();
-                    waybox.enabled = true;
-                    //print("Collider found");
+                    print("Running");
+                    RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
 
-                    if (way.Reset == true)
+
+                    //print("Waypointed");
+                    if (AINumber == 1)
                     {
-                        Destroy(wayPointGO);
-                        wayPoint = false;
-                        RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
-                        // print("Col");
-
-
-                    }
-                    else if (way.Reset == false)
-                    {
-                        // print("WTFGUYS");
-
-                        enemy_AI.isStopped = false;
-                        enemy_AI.speed = 5;
-                        NavMeshPath path = new NavMeshPath();
-                        enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
-                        //print("LMAO");
-                        if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
+                        try
                         {
-                            // print("Hellotehre;");
-                            Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
+                            wayPointGO = GameObject.Find("Waypoint_AI1");
+                            // print("Found run way");
+                            //print(wayPointGO.name);
+                        }
+                        catch
+                        {
+                            print("NO RUN WAYPOINT FOUND");
+                        }
+                    }
+                    else if (AINumber == 2)
+                    {
+                        try
+                        {
+                            wayPointGO = GameObject.Find("Waypoint_AI2");
+                        }
+                        catch
+                        {
+                            print("NO WAYPOINT FOUND");
+                        }
+                    }
+                    else if (AINumber == 3)
+                    {
+                        try
+                        {
+                            wayPointGO = GameObject.Find("Waypoint_AI3");
+                        }
+                        catch
+                        {
+                            print("NO WAYPOINT FOUND");
+                        }
+                    }
+                    else if (AINumber == 4)
+                    {
+                        try
+                        {
+                            wayPointGO = GameObject.Find("Waypoint_AI4");
+                        }
+                        catch
+                        {
+                            print("NO WAYPOINT FOUND");
+                        }
+                    }
+
+
+                    if (wayPointGO != null)
+                    {
+                        Waypointer way = wayPointGO.GetComponent<Waypointer>();
+                        BoxCollider waybox = wayPointGO.GetComponent<BoxCollider>();
+                        waybox.enabled = true;
+                        //print("Collider found");
+
+                        if (way.Reset == true)
+                        {
+                            Destroy(wayPointGO);
                             wayPoint = false;
+                            RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
+                            // print("Col");
+
+
                         }
-                        if (path.status == NavMeshPathStatus.PathComplete)
+                        else if (way.Reset == false)
                         {
-                            enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
+                            // print("WTFGUYS");
+
+                            enemy_AI.isStopped = false;
+                            enemy_AI.speed = 5;
+                            NavMeshPath path = new NavMeshPath();
+                            enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
+                                                                                         //print("LMAO");
+                            if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
+                            {
+                                // print("Hellotehre;");
+                                Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
+                                wayPoint = false;
+                            }
+                            if (path.status == NavMeshPathStatus.PathComplete)
+                            {
+                                enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
+                            }
                         }
+
+
+
                     }
-
-
 
                 }
 
             }
 
         }
+        else if (TargetObj.tag == "Player")
+        {
+            Healthblocks hitTarget = TargetObj.GetComponent<Healthblocks>();
+            tempnumber = hitTarget.segments.Count();
+            tempnumber = tempnumber - 1;
+            tempnumber = (tempnumber * 2) * 10;
+
+            if (Target != null) //If an enemy is found in the scene then continue
+            {
+
+                if (tempnumber <= Health)
+                {
+                    CurrentState = States.Move;
+                    print("Chasing");
+                }
+
+                if (tempnumber > Health)
+                {
+                    print("Running");
+                    RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
+
+
+                    //print("Waypointed");
+                    if (AINumber == 1)
+                    {
+                        try
+                        {
+                            wayPointGO = GameObject.Find("Waypoint_AI1");
+                            // print("Found run way");
+                            //print(wayPointGO.name);
+                        }
+                        catch
+                        {
+                            print("NO RUN WAYPOINT FOUND");
+                        }
+                    }
+                    else if (AINumber == 2)
+                    {
+                        try
+                        {
+                            wayPointGO = GameObject.Find("Waypoint_AI2");
+                        }
+                        catch
+                        {
+                            print("NO WAYPOINT FOUND");
+                        }
+                    }
+                    else if (AINumber == 3)
+                    {
+                        try
+                        {
+                            wayPointGO = GameObject.Find("Waypoint_AI3");
+                        }
+                        catch
+                        {
+                            print("NO WAYPOINT FOUND");
+                        }
+                    }
+                    else if (AINumber == 4)
+                    {
+                        try
+                        {
+                            wayPointGO = GameObject.Find("Waypoint_AI4");
+                        }
+                        catch
+                        {
+                            print("NO WAYPOINT FOUND");
+                        }
+                    }
+
+
+                    if (wayPointGO != null)
+                    {
+                        Waypointer way = wayPointGO.GetComponent<Waypointer>();
+                        BoxCollider waybox = wayPointGO.GetComponent<BoxCollider>();
+                        waybox.enabled = true;
+                        //print("Collider found");
+
+                        if (way.Reset == true)
+                        {
+                            Destroy(wayPointGO);
+                            wayPoint = false;
+                            RandomNavSphereWaypoint(this.transform.position, wanderRadius, -1);
+                            // print("Col");
+
+
+                        }
+                        else if (way.Reset == false)
+                        {
+                            // print("WTFGUYS");
+
+                            enemy_AI.isStopped = false;
+                            enemy_AI.speed = 5;
+                            NavMeshPath path = new NavMeshPath();
+                            enemy_AI.CalculatePath(wayPointGO.transform.position, path); //This calculates whether the path the AI has created is Valid, Invalid or Partial
+                                                                                         //print("LMAO");
+                            if (path.status == NavMeshPathStatus.PathInvalid) //If the AI can't complete the path its created (Off navmesh/blocked)
+                            {
+                                // print("Hellotehre;");
+                                Destroy(wayPointGO);//Destroys the currently unreachable waypoint 
+                                wayPoint = false;
+                            }
+                            if (path.status == NavMeshPathStatus.PathComplete)
+                            {
+                                enemy_AI.SetDestination(wayPointGO.transform.position); //Sets destination towards the spawned waypoint
+                            }
+                        }
+
+
+
+                    }
+
+                }
+
+            }
+
+
+
+        }
+
+
     }
+
 
 
 
@@ -784,7 +923,15 @@ public class MediumAI : MonoBehaviour
         GameObject[] PlayerGO;
         GameObject[] gos;//Creates an empty array for game objects to be placed into 
         AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
-        PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        try
+        {
+            PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        }
+        catch
+        {
+            PlayerGO = null;
+        }
+        
         gos = AIGo.Concat(PlayerGO).ToArray(); //Joins two GameObject arrays to one single array
         GameObject closest = null; //Initialises the return game object
         float distance = Mathf.Infinity; //Initialises a temporary float to measure distance
@@ -814,7 +961,14 @@ public class MediumAI : MonoBehaviour
         GameObject[] PlayerGO;
 
         AIGo = GameObject.FindGameObjectsWithTag("Enemy"); //Fills the array with gameobjects that are tagged as "Enemy"
-        PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        try
+        {
+            PlayerGO = GameObject.FindGameObjectsWithTag("Player");
+        }
+        catch
+        {
+            PlayerGO = null;
+        }
 
         re = AIGo.Concat(PlayerGO).ToArray();//Joins two GameObject arrays to one single array
         GameObject randomEnemy = null; //Initialises an empty game object variable
