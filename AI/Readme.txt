@@ -2,6 +2,9 @@
 
 ######Current implementation requires a box collider, OnTrigger, to be attached to Left Hand Attack Point/Right Arm Attack Point/Strong Arm Attack Point#####
 
+Everything basic works I think.
+Need to properly update and implement powerup scripts.
+
 Static Navmesh will need to be created, I have just used an invisible plane to do so.
 
 
@@ -22,6 +25,7 @@ Ontrigger enter function holding the collission effects
 
 
 Known Issues:
+Charge attacks from the AI need to be changed as they hit instantly and play the animation whilst walking (I know how to fix)
 AI and player can walk through eachother
 animations seem very fast
 AI can get stuck inside player when it goes for a hit but is within runaway hp threshold. (if under 20 hp it can break into a hit command if its too close and then not break out)       
