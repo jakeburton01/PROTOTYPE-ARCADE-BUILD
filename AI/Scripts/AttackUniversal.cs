@@ -24,7 +24,7 @@ public class AttackUniversal : MonoBehaviour
     public EasyAI hitEasy;
     public MediumAI hitMedium;
     public HardAI hitHard;
-    
+
 
 
     private void Start()
@@ -76,16 +76,16 @@ public class AttackUniversal : MonoBehaviour
                     Is_Collided = true;
                     print("ObjectIsHit");
 
-                  //  if (gameObject.GetComponentInParent<Healthblocks>().damagePowerup == true)
-                  //  {
-                   //     hit[0].GetComponent<Healthblocks>().TakeDoubleDamage();
-                  //      gameObject.GetComponentInParent<Healthblocks>().damagePowerup = false;
-                   // }
-                   // else
+                    //  if (gameObject.GetComponentInParent<Healthblocks>().damagePowerup == true)
+                    //  {
+                    //     hit[0].GetComponent<Healthblocks>().TakeDoubleDamage();
+                    //      gameObject.GetComponentInParent<Healthblocks>().damagePowerup = false;
+                    // }
+                    // else
                     //{
-                        hit[0].GetComponent<Healthblocks>().NormalDamage();
-                        //hit[0].gameObject.GetComponent<CharacterAnimation>().BeenHit();
-                   // }
+                    hit[0].GetComponent<Healthblocks>().NormalDamage();
+                    //hit[0].gameObject.GetComponent<CharacterAnimation>().BeenHit();
+                    // }
                 }
 
 
@@ -94,15 +94,15 @@ public class AttackUniversal : MonoBehaviour
                 if (gameObject.CompareTag(Tags.STRONG_PUNCH_TAG))
                 {
 
-                   // if (gameObject.GetComponentInParent<Healthblocks>().damagePowerup == true)
-                   // {
-                   //     hit[0].GetComponent<Healthblocks>().TakeDoubleDamage();
+                    // if (gameObject.GetComponentInParent<Healthblocks>().damagePowerup == true)
+                    // {
+                    //     hit[0].GetComponent<Healthblocks>().TakeDoubleDamage();
                     //    gameObject.GetComponentInParent<Healthblocks>().damagePowerup = false;
-                   //     
+                    //     
                     //} else
                     //{
-                        hit[0].GetComponent<Healthblocks>().NormalDamage();
-                   // }
+                    hit[0].GetComponent<Healthblocks>().NormalDamage();
+                    // }
 
                 }
 
@@ -126,66 +126,117 @@ public class AttackUniversal : MonoBehaviour
 
 
         if (other.tag == "Enemy")
+        {
+            try
             {
-                try
-                {
-                    hitEasy = other.GetComponent<EasyAI>();
-                }
-                catch
-                {
-                    try
-                    {
-                        hitMedium = other.GetComponent<MediumAI>();
-                    }
-                    catch
-                    {
-                        hitHard = other.GetComponent<HardAI>();
-                    }
-                }
-
-                if(hitEasy != null)
-                {
-                    if (other.tag == "Enemy" && this.gameObject.name == "Left Hand Attack Point")
-                    {
-
-                        print("Hitting enemy");
-                        hitEasy.Health = hitEasy.Health - 10;
-                        other.GetComponent<Healthblocks>().NormalDamage();
-                        Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
-                        hitEasy = null;
-                    }
-
-                    else if (other.tag == "Enemy" && this.gameObject.name == "Right Arm Attack Point")
-                    {
-                        print("Hitting enemy");
-                        hitEasy.Health = hitEasy.Health - 10;
-                        other.GetComponent<Healthblocks>().NormalDamage();
-                        Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
-                        hitEasy = null;
-                    }
-                    else if (other.tag == "Enemy" && this.gameObject.name == "Strong Arm Attack Point")
-                    {
-                        print("Hitting enemy");
-                        hitEasy.Health = hitEasy.Health - 10;
-                        other.GetComponent<Healthblocks>().NormalDamage();
-                        Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
-                        hitEasy = null;
-                    }
-                }
-                if(hitMedium != null)
-                {
-
-                }
-                if(hitHard != null)
-                {
-
-                }
-                
+                hitEasy = other.GetComponent<EasyAI>();
             }
-            
-        
+            catch
+            {
+
+            }
+            try
+            {
+                hitMedium = other.GetComponent<MediumAI>();
+            }
+            catch
+            {
+                hitHard = other.GetComponent<HardAI>();
+            }
+
+            if (hitEasy != null)
+            {
+                if (other.tag == "Enemy" && this.gameObject.name == "Left Hand Attack Point")
+                {
+
+                    print("Hitting enemy");
+                    hitEasy.Health = hitEasy.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitEasy = null;
+                }
+
+                else if (other.tag == "Enemy" && this.gameObject.name == "Right Arm Attack Point")
+                {
+                    print("Hitting enemy");
+                    hitEasy.Health = hitEasy.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitEasy = null;
+                }
+                else if (other.tag == "Enemy" && this.gameObject.name == "Strong Arm Attack Point")
+                {
+                    print("Hitting enemy");
+                    hitEasy.Health = hitEasy.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitEasy = null;
+                }
+            }
+            if (hitMedium != null)
+            {
+                if (other.tag == "Enemy" && this.gameObject.name == "Left Hand Attack Point")
+                {
+
+                    print("Hitting enemy");
+                    hitMedium.Health = hitMedium.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitMedium = null;
+                }
+
+                else if (other.tag == "Enemy" && this.gameObject.name == "Right Arm Attack Point")
+                {
+                    print("Hitting enemy");
+                    hitMedium.Health = hitMedium.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitMedium = null;
+                }
+                else if (other.tag == "Enemy" && this.gameObject.name == "Strong Arm Attack Point")
+                {
+                    print("Hitting enemy");
+                    hitMedium.Health = hitMedium.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitMedium = null;
+                }
+            }
+            if (hitHard != null)
+            {
+                if (other.tag == "Enemy" && this.gameObject.name == "Left Hand Attack Point")
+                {
+
+                    print("Hitting enemy");
+                    hitHard.Health = hitHard.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitHard = null;
+                }
+
+                else if (other.tag == "Enemy" && this.gameObject.name == "Right Arm Attack Point")
+                {
+                    print("Hitting enemy");
+                    hitHard.Health = hitHard.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitHard = null;
+                }
+                else if (other.tag == "Enemy" && this.gameObject.name == "Strong Arm Attack Point")
+                {
+                    print("Hitting enemy");
+                    hitHard.Health = hitHard.Health - 10;
+                    other.GetComponent<Healthblocks>().NormalDamage();
+                    Instantiate(hit_FX, hitFX_Pos, Quaternion.identity);
+                    hitHard = null;
+                }
+            }
+
+        }
+
+
     }
-    
+
 
 
 
