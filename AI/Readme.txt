@@ -1,7 +1,31 @@
-~~~02/05/2020
+~~~03/05/2020
+
+######Current implementation requires a box collider, OnTrigger, to be attached to Left Hand Attack Point/Right Arm Attack Point/Strong Arm Attack Point#####
+
 
 Working on player/AI intergration, small amounts of non-AI code will be changed (Will log each change). 
-Currently no FX on hit, only left punch implemented 
+only left punch implemented 
+
+FX on hit is working now, easy AI should be fully implemented now
+
+Changes made in Healthblocks:
+
+Added a public bool AIRegen, initialised in start as false, made true in the regen function.  Simply handles the hp regen for the AI health number as AIs handle HP internally rather than via Healthblocks script
+
+
+Changes made in AttackUniversal:
+
+Three new public objects to hold scripts when hitting
+Ontrigger enter function holding the collission effects
+
+
+Known Issues:
+AI and player can walk through eachother
+animations seem very fast
+AI can get stuck inside player when it goes for a hit but is within runaway hp threshold. (if under 20 hp it can break into a hit command if its too close and then not break out)
+Model doesn't get destroyed when dropped to 0hp (should be easy fix)
+Navmesh floats above the arena floor due to bottom of navmesh not being bottom of model
+
 
 Will provide either a full project file or prefabs when complete
 
